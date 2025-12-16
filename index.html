@@ -1,0 +1,5057 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="pageTitle">TARGET FIT - Academia Premium</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+    <!-- Firebase 8.10.0 - Realtime Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <style>
+        :root {
+            --primary-black: #111111;
+            --primary-red: #C41E3A;
+            --dark-red: #8B0000;
+            --darker-red: #5A0000;
+            --light-red: #FF6B6B;
+            --light-gray: #F8F9FA;
+            --medium-gray: #E9ECEF;
+            --dark-gray: #495057;
+            --white: #FFFFFF;
+            --highlight: #FFD700;
+            --success: #28A745;
+            --info: #17A2B8;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+            --radius: 10px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--dark-gray);
+            background-color: var(--white);
+            overflow-x: hidden;
+            touch-action: pan-y;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: var(--primary-black);
+        }
+
+        /* Container principal */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header elegante */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            padding: 16px 0;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .logo h1 {
+            font-size: 1.6rem;
+            letter-spacing: -0.5px;
+        }
+
+        .logo .black {
+            color: var(--primary-black);
+        }
+
+        .logo .red {
+            color: var(--primary-red);
+        }
+
+        /* Menu hamburger */
+        .menu-toggle {
+            width: 30px;
+            height: 20px;
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary-black);
+            border-radius: 3px;
+            transition: var(--transition);
+        }
+
+        /* Botão de Suporte (Fale Conosco) */
+        .support-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 999;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .support-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.4);
+        }
+
+        /* Perfil da Empresa */
+        .company-profile {
+            display: none;
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            border: 1px solid var(--medium-gray);
+        }
+
+        .company-profile.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .company-profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .company-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 20px;
+            border: 5px solid transparent;
+            background: linear-gradient(45deg, var(--darker-red), var(--primary-red)) border-box;
+        }
+
+        .company-name {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .verified-badge {
+            color: var(--primary-red);
+            font-size: 1.2rem;
+        }
+
+        .company-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .btn-work-with-us {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-work-with-us:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-hide-profile {
+            padding: 12px 30px;
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-hide-profile:hover {
+            background: var(--medium-gray);
+        }
+
+        /* Menu lateral */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -320px;
+            width: 320px;
+            height: 100%;
+            background-color: var(--white);
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.1);
+            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            background: linear-gradient(135deg, var(--primary-black) 0%, var(--dark-gray) 100%);
+            color: var(--white);
+        }
+
+        .sidebar-header h2 {
+            color: var(--white);
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        .close-sidebar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-sidebar:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 2px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--dark-gray);
+            text-decoration: none;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(196, 30, 58, 0.05);
+            color: var(--primary-red);
+            border-left-color: var(--primary-red);
+        }
+
+        .sidebar-menu i {
+            width: 22px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .sidebar-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--medium-gray);
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+            text-align: center;
+        }
+
+        /* Overlay para fechar menu */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Conteúdo principal */
+        main {
+            margin-top: 78px;
+        }
+
+        /* Hero section */
+        .hero {
+            padding: 60px 0 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            margin-bottom: 40px;
+        }
+
+        .hero h2 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto 25px;
+            color: var(--dark-gray);
+        }
+
+        .highlight {
+            color: var(--primary-red);
+        }
+
+        /* Seções */
+        .section {
+            padding: 60px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-title h2 {
+            font-size: 1.8rem;
+            margin-bottom: 12px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2:after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-red);
+            border-radius: 2px;
+        }
+
+        .section-title p {
+            font-size: 1rem;
+            color: var(--dark-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ============================
+           FILTRO DE CARGO
+           ============================ */
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 25px;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            border: 2px solid var(--medium-gray);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--medium-gray);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-red);
+            color: var(--white);
+            border-color: var(--primary-red);
+        }
+
+        /* ============================
+           CARDS DE PLANOS
+           ============================ */
+        .plans-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .plan-card {
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            border: 1px solid var(--medium-gray);
+            position: relative;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .plan-card.featured {
+            border: 2px solid var(--primary-red);
+            transform: scale(1.02);
+        }
+
+        .plan-card.featured:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .plan-card.promotion {
+            border: 3px solid var(--primary-red);
+            position: relative;
+        }
+
+        .plan-card.promotion::before {
+            content: 'PROMOÇÃO';
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background-color: var(--primary-red);
+            color: var(--white);
+            padding: 8px 35px;
+            transform: rotate(45deg);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+        }
+
+        .plan-featured-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            color: var(--white);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+        }
+
+        .plan-header {
+            padding: 40px 30px;
+            background: linear-gradient(135deg, var(--primary-black) 0%, #222 100%);
+            color: var(--white);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .plan-card:hover .plan-header::before {
+            transform: translateX(100%);
+        }
+
+        .plan-header h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .plan-price-container {
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .plan-price {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .plan-period {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        .plan-currency {
+            font-size: 1.5rem;
+            vertical-align: top;
+            margin-right: 2px;
+        }
+
+        .plan-body {
+            padding: 30px;
+        }
+
+        .plan-description {
+            color: var(--dark-gray);
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .plan-features-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .plan-feature-item {
+            padding: 12px 0;
+            border-bottom: 1px solid var(--medium-gray);
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .plan-feature-item:hover {
+            background-color: rgba(196, 30, 58, 0.03);
+            padding-left: 10px;
+        }
+
+        .plan-feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .plan-feature-item i {
+            color: var(--primary-red);
+            margin-right: 12px;
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .plan-actions {
+            padding: 20px 30px;
+            border-top: 1px solid var(--medium-gray);
+            background-color: var(--light-gray);
+        }
+
+        .btn-plan {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            color: var(--white);
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-plan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(196, 30, 58, 0.3);
+        }
+
+        /* ============================
+           LISTA DE FUNCIONÁRIOS
+           ============================ */
+        .employees-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .employee-list-item {
+            background: var(--white);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 1px solid var(--medium-gray);
+        }
+
+        .employee-list-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-red);
+        }
+
+        .employee-list-header {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid var(--medium-gray);
+        }
+
+        .employee-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+            background-color: var(--medium-gray);
+            border: 3px solid transparent;
+            background-clip: padding-box;
+            position: relative;
+        }
+
+        .employee-avatar::after {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--darker-red), var(--primary-red));
+            z-index: -1;
+        }
+
+        .employee-info-container {
+            flex: 1;
+        }
+
+        .employee-name-role {
+            margin-bottom: 10px;
+        }
+
+        .employee-name {
+            font-size: 1.3rem;
+            color: var(--primary-black);
+            margin-bottom: 5px;
+        }
+
+        .employee-role {
+            color: var(--primary-red);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .employee-rating-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(255, 215, 0, 0.1);
+            color: var(--primary-black);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .employee-rating-badge i {
+            color: var(--highlight);
+            margin-right: 5px;
+        }
+
+        .employee-list-body {
+            padding: 25px;
+        }
+
+        .employee-description {
+            color: var(--dark-gray);
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        .employee-expertise {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .expertise-tag {
+            background-color: rgba(196, 30, 58, 0.1);
+            color: var(--primary-red);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .employee-actions {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        .btn-rate-employee {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+        }
+
+        .btn-rate-employee:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-view-comments {
+            padding: 12px 30px;
+            background: var(--light-gray);
+            color: var(--dark-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-view-comments:hover {
+            background: var(--medium-gray);
+        }
+
+        /* ============================
+           MODAL DE AVALIAÇÃO
+           ============================ */
+        .rating-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .rating-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .rating-modal-content {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            transform: translateY(30px) scale(0.95);
+            transition: var(--transition);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .rating-modal.active .rating-modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .rating-modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .rating-modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--primary-black);
+        }
+
+        .rating-modal-subtitle {
+            color: var(--dark-gray);
+            font-size: 1rem;
+        }
+
+        .rating-modal-employee-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(196, 30, 58, 0.05);
+            border-radius: var(--radius);
+        }
+
+        .rating-modal-employee-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-red);
+        }
+
+        .rating-modal-employee-details h4 {
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .rating-modal-employee-details p {
+            color: var(--primary-red);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .rating-modal-rating-stars {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 25px 0;
+        }
+
+        .rating-star-large {
+            font-size: 2.5rem;
+            color: var(--medium-gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .rating-star-large.active {
+            color: var(--highlight);
+            transform: scale(1.1);
+        }
+
+        .rating-modal-form {
+            margin-top: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--light-gray);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+            background-color: var(--white);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .rating-modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-submit-rating {
+            flex: 1;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .btn-submit-rating:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(196, 30, 58, 0.3);
+        }
+
+        .btn-cancel-rating {
+            padding: 16px 30px;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+        }
+
+        .btn-cancel-rating:hover {
+            background-color: var(--medium-gray);
+        }
+
+        .close-rating-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-gray);
+            cursor: pointer;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-rating-modal:hover {
+            background-color: var(--light-gray);
+            color: var(--primary-red);
+        }
+
+        /* ============================
+           MODAL DE COMENTÁRIOS
+           ============================ */
+        .comments-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .comments-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .comments-modal-content {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            transform: translateY(30px) scale(0.95);
+            transition: var(--transition);
+        }
+
+        .comments-modal.active .comments-modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .comments-list {
+            margin-top: 25px;
+        }
+
+        .comment-item {
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-red);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: var(--primary-black);
+        }
+
+        .comment-date {
+            color: var(--dark-gray);
+        }
+
+        .comment-rating {
+            color: var(--highlight);
+            margin: 5px 0;
+        }
+
+        .comment-text {
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        /* ============================
+           MODAL TRABALHE CONOSCO
+           ============================ */
+        .work-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .work-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .work-modal-content {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            transform: translateY(30px) scale(0.95);
+            transition: var(--transition);
+        }
+
+        .work-modal.active .work-modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .work-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .work-option {
+            padding: 20px;
+            background: var(--light-gray);
+            border: 2px solid var(--medium-gray);
+            border-radius: var(--radius);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .work-option:hover {
+            border-color: var(--primary-red);
+            background: rgba(196, 30, 58, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .work-option i {
+            font-size: 2rem;
+            color: var(--primary-red);
+            margin-bottom: 10px;
+        }
+
+        /* ============================
+           LOGIN CENTRALIZADO E BONITO
+           ============================ */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-black) 0%, var(--dark-gray) 100%);
+            padding: 20px;
+        }
+
+        .login-box {
+            width: 100%;
+            max-width: 450px;
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            padding: 50px 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-logo h2 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 35px;
+            font-size: 1.8rem;
+            color: var(--primary-black);
+            position: relative;
+        }
+
+        .login-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--primary-red);
+            border-radius: 2px;
+        }
+
+        .login-error {
+            background-color: rgba(196, 30, 58, 0.1);
+            color: var(--primary-red);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            text-align: center;
+            display: none;
+            font-size: 0.95rem;
+            border-left: 4px solid var(--primary-red);
+        }
+
+        .login-form .form-group {
+            margin-bottom: 25px;
+        }
+
+        .login-form .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-gray);
+            font-size: 0.95rem;
+        }
+
+        .login-form .form-control {
+            width: 100%;
+            padding: 16px 20px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: var(--light-gray);
+        }
+
+        .login-form .form-control:focus {
+            outline: none;
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(196, 30, 58, 0.1);
+            background-color: var(--white);
+        }
+
+        .login-form .btn-plan {
+            margin-top: 10px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* ============================
+           DASHBOARD
+           ============================ */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+            background-color: var(--light-gray);
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-black) 0%, var(--dark-gray) 100%);
+            color: var(--white);
+            padding: 20px 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .dashboard-header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .dashboard-logo h1 {
+            font-size: 1.4rem;
+            color: var(--white);
+        }
+
+        .dashboard-nav {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-red);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--white);
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .logout-btn:hover {
+            background-color: var(--primary-red);
+        }
+
+        .dashboard-content {
+            padding: 30px 0 60px;
+        }
+
+        /* Abas do Dashboard */
+        .dashboard-tabs {
+            display: flex;
+            overflow-x: auto;
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+            padding: 0 5px;
+        }
+
+        .dashboard-tab {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark-gray);
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-tab:hover {
+            color: var(--primary-red);
+            background-color: rgba(196, 30, 58, 0.05);
+        }
+
+        .dashboard-tab.active {
+            color: var(--primary-red);
+            border-bottom-color: var(--primary-red);
+            background-color: rgba(196, 30, 58, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards do Dashboard */
+        .dashboard-card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .dashboard-card-title {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-red);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        /* Lista de Candidatos */
+        .candidates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .candidate-item {
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid var(--medium-gray);
+            transition: var(--transition);
+        }
+
+        .candidate-item:hover {
+            border-color: var(--primary-red);
+            box-shadow: var(--shadow);
+        }
+
+        .candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .candidate-info h4 {
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .candidate-role {
+            color: var(--primary-red);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .candidate-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-whatsapp {
+            background-color: rgba(37, 211, 102, 0.1);
+            color: #25D366;
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #25D366;
+            color: white;
+        }
+
+        /* WhatsApp número da empresa - CORRIGIDO (branco no celular) */
+        .btn-whatsapp-company {
+            background-color: rgba(37, 211, 102, 0.1);
+            color: #25D366;
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+            text-decoration: none;
+            width: fit-content;
+        }
+
+        .btn-whatsapp-company:hover {
+            background-color: #25D366;
+            color: white;
+        }
+
+        /* Corrigir para mobile */
+        @media (max-width: 768px) {
+            .btn-whatsapp-company {
+                color: #25D366 !important; /* Força a cor verde */
+                background-color: rgba(37, 211, 102, 0.1);
+            }
+
+            .btn-whatsapp-company:hover, 
+            .btn-whatsapp-company:active {
+                color: white !important;
+                background-color: #25D366;
+            }
+        }
+
+        /* Lista de Acessos */
+        .access-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .access-item {
+            background: var(--light-gray);
+            border-radius: var(--radius);
+            padding: 20px;
+            border: 1px solid var(--medium-gray);
+        }
+
+        .access-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .access-email {
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .access-password {
+            color: #999;
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        /* FILTRO DE COMENTÁRIOS NO DASHBOARD */
+        .comments-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .comments-filter input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 15px;
+            border: 1px solid var(--medium-gray);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        /* Lista de Planos no Dashboard */
+        .dashboard-plan-item {
+            background-color: var(--light-gray);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--medium-gray);
+            transition: var(--transition);
+        }
+
+        .dashboard-plan-item:hover {
+            border-color: var(--primary-red);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-plan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .dashboard-plan-name {
+            font-size: 1.2rem;
+            color: var(--primary-black);
+        }
+
+        .dashboard-plan-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-red);
+        }
+
+        .dashboard-plan-details {
+            margin-bottom: 25px;
+        }
+
+        .dashboard-plan-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .dashboard-plan-feature {
+            background-color: rgba(196, 30, 58, 0.1);
+            color: var(--primary-red);
+            padding: 6px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .dashboard-plan-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-edit {
+            background-color: rgba(52, 152, 219, 0.1);
+            color: #3498db;
+        }
+
+        .btn-edit:hover {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-promotion {
+            background-color: rgba(241, 196, 15, 0.1);
+            color: #f1c40f;
+        }
+
+        .btn-promotion:hover {
+            background-color: #f1c40f;
+            color: white;
+        }
+
+        .btn-hide {
+            background-color: rgba(155, 89, 182, 0.1);
+            color: #9b59b6;
+        }
+
+        .btn-hide:hover {
+            background-color: #9b59b6;
+            color: white;
+        }
+
+        /* Botões de Configuração */
+        .config-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .btn-config {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn-config:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.3);
+        }
+
+        /* Modal de Configurações */
+        .config-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2001;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .config-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .config-modal-content {
+            background-color: var(--white);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 800px; /* Aumentado para caber mais abas */
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+            transform: translateY(30px) scale(0.95);
+            transition: var(--transition);
+        }
+
+        .config-modal.active .config-modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .config-modal-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .config-modal-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: var(--primary-black);
+        }
+
+        .config-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .config-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            color: var(--dark-gray);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .config-tab.active {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+
+        .config-tab-content {
+            display: none;
+        }
+
+        .config-tab-content.active {
+            display: block;
+        }
+
+        /* Utilitários */
+        .hidden {
+            display: none !important;
+        }
+
+        .visible {
+            display: block !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--white);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-black);
+            color: var(--white);
+            padding: 50px 0 25px;
+        }
+
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .footer-about p {
+            margin-bottom: 20px;
+            line-height: 1.8;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .footer-links h3, .footer-contact h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--white);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-red);
+            padding-left: 5px;
+        }
+
+        .footer-contact p {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .footer-contact i {
+            color: var(--primary-red);
+            width: 18px;
+            font-size: 0.9rem;
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 1.8rem;
+            }
+
+            .section-title h2 {
+                font-size: 1.5rem;
+            }
+
+            .plans-container {
+                grid-template-columns: 1fr;
+            }
+
+            .employee-list-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .employee-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .dashboard-plan-header,
+            .dashboard-employee-header {
+                flex-direction: column;
+                text-align: left;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .dashboard-plan-actions {
+                flex-direction: column;
+            }
+
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .config-buttons {
+                flex-direction: column;
+            }
+
+            .btn-config {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .login-box {
+                padding: 40px 30px;
+            }
+
+            .support-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 55px;
+                height: 55px;
+                font-size: 1.3rem;
+            }
+
+            .company-name {
+                font-size: 1.5rem;
+            }
+
+            .company-actions {
+                flex-direction: column;
+            }
+
+            .work-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h2 {
+                font-size: 1.5rem;
+            }
+
+            .section {
+                padding: 40px 0;
+            }
+
+            .plan-price {
+                font-size: 2.2rem;
+            }
+
+            .rating-modal-content,
+            .config-modal-content,
+            .work-modal-content,
+            .comments-modal-content {
+                padding: 25px;
+            }
+
+            .rating-modal-actions {
+                flex-direction: column;
+            }
+
+            .btn-submit-rating,
+            .btn-cancel-rating {
+                width: 100%;
+            }
+
+            .filter-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .filter-btn {
+                width: 100%;
+                max-width: 250px;
+            }
+
+            .work-options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <div class="logo" id="homeLogo">
+                <h1><span class="black" id="logoFirst">TARGET</span> <span class="red" id="logoSecond">FIT</span></h1>
+            </div>
+            <button class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Botão de Suporte Flutuante -->
+    <button class="support-btn" id="supportBtn">
+        <i class="fas fa-headset"></i>
+    </button>
+
+    <!-- Status de Boas-vindas -->
+    <div class="welcome-container" id="welcomeContainer" style="display: none; position: fixed; top: 80px; left: 0; right: 0; z-index: 999; text-align: center; padding: 15px; background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%); color: white;">
+        <div class="welcome-message" id="welcomeMessage">
+            <div class="welcome-title" id="welcomeTitle" style="font-weight: bold; font-size: 1.1rem;">Olá Seja bem Vindo a Target Fit</div>
+            <div class="welcome-subtitle" id="welcomeSubtitle" style="font-size: 0.9rem;">Transforme seu corpo, transforme sua vida!</div>
+        </div>
+    </div>
+
+    <!-- Menu Lateral -->
+    <div class="overlay" id="overlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2 id="sidebarTitle">TARGET FIT</h2>
+            <p>Academia</p>
+            <button class="close-sidebar" id="closeSidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#plans"><i class="fas fa-dumbbell"></i> Planos</a></li>
+            <li><a href="#employees"><i class="fas fa-users"></i> Nossa Equipe</a></li>
+            <li><a href="#" id="whatsappBtn"><i class="fab fa-whatsapp"></i> Fale Conosco</a></li>
+            <li><a href="#" id="workWithUsSidebarBtn"><i class="fas fa-briefcase"></i> Trabalhe Conosco</a></li>
+            <li><a href="#" id="dashboardBtn"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <p id="sidebarFooterText">Transforme seu corpo, transforme sua vida</p>
+        </div>
+    </aside>
+
+    <!-- Conteúdo Principal -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h2 id="heroTitle">Transforme seu corpo, <span class="highlight" id="heroHighlight">transforme sua vida</span></h2>
+                <p id="heroDescription">Na TARGET FIT, oferecemos os melhores equipamentos, profissionais qualificados e um ambiente motivador para você alcançar seus objetivos.</p>
+                <a href="#plans" class="btn-plan">Conheça nossos planos</a>
+            </div>
+        </section>
+
+        <!-- Planos -->
+        <section class="section" id="plans">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Planos Exclusivos</h2>
+                    <p id="plansSubtitle">Escolha o plano ideal para sua jornada fitness</p>
+                </div>
+                <div class="plans-container" id="plansContainer">
+                    <!-- Planos serão carregados via Firebase -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Funcionários com Filtro -->
+        <section class="section employees-section" id="employees">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Nossa Equipe</h2>
+                    <p id="employeesSubtitle">Profissionais qualificados para te acompanhar</p>
+                </div>
+
+                <!-- Filtro de Cargo -->
+                <div class="filter-container" id="roleFilterContainer">
+                    <button class="filter-btn active" data-role="all">Todos</button>
+                    <!-- Filtros serão gerados dinamicamente -->
+                </div>
+
+                <div class="employees-container" id="employeesList">
+                    <!-- Funcionários serão carregados via Firebase -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Avaliação -->
+    <div class="rating-modal" id="ratingModal">
+        <div class="rating-modal-content">
+            <button class="close-rating-modal" id="closeRatingModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="rating-modal-header">
+                <h3 class="rating-modal-title">Avaliar Funcionário</h3>
+                <p class="rating-modal-subtitle">Sua opinião é muito importante para nós</p>
+                <div class="rating-modal-employee-info" id="ratingEmployeeInfo">
+                    <!-- Informações do funcionário serão inseridas aqui -->
+                </div>
+            </div>
+
+            <div class="rating-modal-rating-stars">
+                <i class="fas fa-star rating-star-large" data-value="1"></i>
+                <i class="fas fa-star rating-star-large" data-value="2"></i>
+                <i class="fas fa-star rating-star-large" data-value="3"></i>
+                <i class="fas fa-star rating-star-large" data-value="4"></i>
+                <i class="fas fa-star rating-star-large" data-value="5"></i>
+            </div>
+
+            <form id="ratingForm" class="rating-modal-form">
+                <div class="form-group">
+                    <label class="form-label" for="studentName">Seu Nome *</label>
+                    <input type="text" class="form-control" id="studentName" placeholder="Digite seu nome completo">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="comment">Comentário *</label>
+                    <textarea class="form-control" id="comment" rows="4" placeholder="Conte-nos sobre sua experiência com este profissional..."></textarea>
+                </div>
+
+                <input type="hidden" id="employeeId">
+
+                <div class="rating-modal-actions">
+                    <button type="button" class="btn-cancel-rating" id="cancelRatingBtn">Cancelar</button>
+                    <button type="submit" class="btn-submit-rating" id="submitRatingBtn">
+                        <span id="submitRatingText">Enviar Avaliação</span>
+                        <span class="loading hidden" id="submitRatingLoading"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Comentários -->
+    <div class="comments-modal" id="commentsModal">
+        <div class="comments-modal-content">
+            <button class="close-rating-modal" id="closeCommentsModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="rating-modal-header">
+                <h3 class="rating-modal-title" id="commentsModalTitle">Comentários</h3>
+                <p class="rating-modal-subtitle" id="commentsModalSubtitle">Avaliações dos alunos sobre este profissional</p>
+                <div class="rating-modal-employee-info" id="commentsEmployeeInfo">
+                    <!-- Informações do funcionário serão inseridas aqui -->
+                </div>
+            </div>
+            <div class="comments-list" id="commentsList">
+                <!-- Comentários serão carregados aqui -->
+            </div>
+            <div class="rating-modal-actions" style="margin-top: 25px;">
+                <button type="button" class="btn-cancel-rating" id="closeCommentsBtn">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Trabalhe Conosco (Seleção de Função) -->
+    <div class="work-modal" id="workModal">
+        <div class="work-modal-content">
+            <button class="close-rating-modal" id="closeWorkModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="rating-modal-header">
+                <h3 class="rating-modal-title">Trabalhe Conosco</h3>
+                <p class="rating-modal-subtitle">Selecione a função que deseja se candidatar</p>
+            </div>
+            <div class="work-options">
+                <div class="work-option" data-role="Recepcionista">
+                    <i class="fas fa-concierge-bell"></i>
+                    <p>Recepcionista</p>
+                </div>
+                <div class="work-option" data-role="Professor">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <p>Professor</p>
+                </div>
+                <div class="work-option" data-role="Limpeza">
+                    <i class="fas fa-broom"></i>
+                    <p>Limpeza</p>
+                </div>
+                <div class="work-option" data-role="Estagiário">
+                    <i class="fas fa-user-graduate"></i>
+                    <p>Estagiário</p>
+                </div>
+                <div class="work-option" data-role="Supervisor">
+                    <i class="fas fa-user-tie"></i>
+                    <p>Supervisor</p>
+                </div>
+            </div>
+            <div class="rating-modal-actions" style="margin-top: 25px;">
+                <button type="button" class="btn-cancel-rating" id="closeWorkOptionsBtn">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Formulário Trabalhe Conosco -->
+    <div class="rating-modal" id="workFormModal">
+        <div class="rating-modal-content">
+            <button class="close-rating-modal" id="closeWorkFormModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="rating-modal-header">
+                <h3 class="rating-modal-title">Trabalhe Conosco</h3>
+                <p class="rating-modal-subtitle">Preencha o formulário para se candidatar</p>
+            </div>
+
+            <form id="workForm" class="rating-modal-form">
+                <input type="hidden" id="selectedRole">
+
+                <div class="form-group">
+                    <label class="form-label" for="firstName">Nome *</label>
+                    <input type="text" class="form-control" id="firstName" placeholder="Seu nome">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="lastName">Sobrenome *</label>
+                    <input type="text" class="form-control" id="lastName" placeholder="Seu sobrenome">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="birthDate">Data de Nascimento *</label>
+                    <input type="date" class="form-control" id="birthDate" max="">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="email">E-mail *</label>
+                    <input type="email" class="form-control" id="candidateEmail" placeholder="seu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Telefone *</label>
+                    <input type="tel" class="form-control" id="phone" placeholder="(11) 99999-9999">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="address">Endereço *</label>
+                    <input type="text" class="form-control" id="address" placeholder="Rua, Avenida, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="addressNumber">Número *</label>
+                    <input type="text" class="form-control" id="addressNumber" placeholder="123">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="complement">Complemento</label>
+                    <input type="text" class="form-control" id="complement" placeholder="Apto, Bloco, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="aboutYou">Me conte um pouco sobre você *</label>
+                    <textarea class="form-control" id="aboutYou" rows="3" placeholder="Fale sobre seus interesses, objetivos..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="experience">Sua Experiência *</label>
+                    <textarea class="form-control" id="experience" rows="3" placeholder="Descreva suas experiências profissionais anteriores..."></textarea>
+                </div>
+
+                <div class="rating-modal-actions">
+                    <button type="button" class="btn-cancel-rating" id="cancelWorkFormBtn">Cancelar</button>
+                    <button type="submit" class="btn-submit-rating" id="submitWorkFormBtn">
+                        <span id="submitWorkFormText">Enviar Candidatura</span>
+                        <span class="loading hidden" id="submitWorkFormLoading"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações -->
+    <div class="config-modal" id="configModal">
+        <div class="config-modal-content">
+            <button class="close-rating-modal" id="closeConfigModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="config-modal-header">
+                <h3 class="config-modal-title">Configurações do Sistema</h3>
+                <p class="rating-modal-subtitle">Personalize todas as informações da página</p>
+            </div>
+
+            <div class="config-tabs">
+                <button class="config-tab active" data-tab="general">Geral</button>
+                <button class="config-tab" data-tab="texts">Textos</button>
+                <button class="config-tab" data-tab="whatsapp">WhatsApp</button>
+                <button class="config-tab" data-tab="company">Empresa</button>
+                <button class="config-tab" data-tab="footer">Rodapé</button>
+                <button class="config-tab" data-tab="press">Imprensa</button>
+            </div>
+
+            <form id="configForm">
+                <!-- Aba Geral -->
+                <div class="config-tab-content active" data-tab="general">
+                    <div class="form-group">
+                        <label class="form-label" for="configPageTitle">Título da Página</label>
+                        <input type="text" class="form-control" id="configPageTitle" placeholder="Ex: TARGET FIT - Academia Premium">
+                        <small class="help-text">Este título aparecerá na aba do navegador</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configLogoFirst">Primeira Parte do Logo</label>
+                        <input type="text" class="form-control" id="configLogoFirst" placeholder="Ex: TARGET">
+                        <small class="help-text">Parte em preto do logo</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configLogoSecond">Segunda Parte do Logo</label>
+                        <input type="text" class="form-control" id="configLogoSecond" placeholder="Ex: FIT">
+                        <small class="help-text">Parte em vermelho do logo</small>
+                    </div>
+                </div>
+
+                <!-- Aba Textos -->
+                <div class="config-tab-content" data-tab="texts">
+                    <div class="form-group">
+                        <label class="form-label" for="configWelcomeTitle">Título de Boas-vindas</label>
+                        <input type="text" class="form-control" id="configWelcomeTitle" placeholder="Ex: Olá Seja bem Vindo a Target Fit">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configWelcomeSubtitle">Subtítulo de Boas-vindas</label>
+                        <input type="text" class="form-control" id="configWelcomeSubtitle" placeholder="Ex: Transforme seu corpo, transforme sua vida!">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configHeroTitle">Título do Hero</label>
+                        <input type="text" class="form-control" id="configHeroTitle" placeholder="Ex: Transforme seu corpo, transforme sua vida">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configHeroDescription">Descrição do Hero</label>
+                        <textarea class="form-control" id="configHeroDescription" rows="3" placeholder="Descrição abaixo do título principal"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configPlansSubtitle">Subtítulo dos Planos</label>
+                        <input type="text" class="form-control" id="configPlansSubtitle" placeholder="Ex: Escolha o plano ideal para sua jornada fitness">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configEmployeesSubtitle">Subtítulo dos Funcionários</label>
+                        <input type="text" class="form-control" id="configEmployeesSubtitle" placeholder="Ex: Profissionais qualificados para te acompanhar">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configSidebarText">Texto do Rodapé do Menu</label>
+                        <input type="text" class="form-control" id="configSidebarText" placeholder="Ex: Transforme seu corpo, transforme sua vida">
+                    </div>
+                </div>
+
+                <!-- Aba WhatsApp -->
+                <div class="config-tab-content" data-tab="whatsapp">
+                    <div class="form-group">
+                        <label class="form-label" for="configWhatsAppNumber">Número do WhatsApp</label>
+                        <input type="text" class="form-control" id="configWhatsAppNumber" placeholder="Ex: 5511999999999">
+                        <small class="help-text">Número completo com código do país e DDD</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configPlanMessage">Mensagem para Planos</label>
+                        <textarea class="form-control" id="configPlanMessage" rows="3" placeholder="Ex: Olá, gostaria de informações sobre o plano [PLANO]"></textarea>
+                        <small class="help-text">Use [PLANO] para incluir o nome do plano automaticamente</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configContactMessage">Mensagem para Fale Conosco</label>
+                        <textarea class="form-control" id="configContactMessage" rows="3" placeholder="Ex: Olá, gostaria de mais informações sobre a academia!"></textarea>
+                    </div>
+                </div>
+
+                <!-- Aba Empresa -->
+                <div class="config-tab-content" data-tab="company">
+                    <div class="form-group">
+                        <label class="form-label" for="configCompanyName">Nome da Empresa</label>
+                        <input type="text" class="form-control" id="configCompanyName" placeholder="Ex: Target Fit">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configCompanyPhoto">URL da Foto da Empresa (Imgur)</label>
+                        <input type="text" class="form-control" id="configCompanyPhoto" placeholder="Ex: https://i.imgur.com/...">
+                        <small class="help-text">URL da imagem para o perfil da empresa</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configCompanyDescription">Descrição da Empresa</label>
+                        <textarea class="form-control" id="configCompanyDescription" rows="3" placeholder="Descrição da empresa"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configCompanyBiography">Biografia da Empresa</label>
+                        <textarea class="form-control" id="configCompanyBiography" rows="5" placeholder="História da empresa, missão, valores..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Aba Rodapé -->
+                <div class="config-tab-content" data-tab="footer">
+                    <div class="form-group">
+                        <label class="form-label" for="configFooterAddress">Endereço</label>
+                        <input type="text" class="form-control" id="configFooterAddress" placeholder="Ex: Av. Giovanni Gronchi, 1060 - Morumbi">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configFooterPhone">Telefone</label>
+                        <input type="text" class="form-control" id="configFooterPhone" placeholder="Ex: 11959749844">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configFooterEmail">E-mail</label>
+                        <input type="text" class="form-control" id="configFooterEmail" placeholder="Ex: Targetpalacio@gmail.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configFooterHours">Horário de Funcionamento</label>
+                        <input type="text" class="form-control" id="configFooterHours" placeholder="Ex: Seg a Sexta 5:30 - 00H | Sabado 8h - 18h | Domingo 8h - 14h">
+                    </div>
+                </div>
+
+                <!-- Aba Imprensa -->
+                <div class="config-tab-content" data-tab="press">
+                    <div class="form-group">
+                        <label class="form-label" for="configPressImage">URL da Imagem da Imprensa</label>
+                        <input type="text" class="form-control" id="configPressImage" placeholder="Ex: https://i.imgur.com/...">
+                        <small class="help-text">URL da imagem para a seção de imprensa</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label for="configPressTitle">Título da Imprensa</label>
+                        <input type="text" class="form-control" id="configPressTitle" placeholder="Ex: Na Mídia">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="configPressDescription">Descrição da Imprensa</label>
+                        <textarea class="form-control" id="configPressDescription" rows="4" placeholder="Descrição sobre a cobertura da mídia..."></textarea>
+                    </div>
+                </div>
+
+                <div class="rating-modal-actions">
+                    <button type="button" class="btn-cancel-rating" id="cancelConfigBtn">Cancelar</button>
+                    <button type="submit" class="btn-submit-rating" id="saveConfigBtn">
+                        <span id="saveConfigText">Salvar Configurações</span>
+                        <span class="loading hidden" id="saveConfigLoading"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login -->
+    <div class="login-container" id="loginContainer">
+        <div class="login-box">
+            <div class="login-logo">
+                <h2><span class="black" id="loginLogoFirst">TARGET</span> <span class="red" id="loginLogoSecond">FIT</span></h2>
+            </div>
+            <h3 class="login-title">Dashboard Administrativo</h3>
+            <div class="login-error" id="loginError">E-mail ou senha incorretos.</div>
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label class="form-label" for="email">E-mail</label>
+                    <input type="email" class="form-control" id="email" placeholder="seu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Senha</label>
+                    <input type="password" class="form-control" id="password" placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn-plan" id="loginBtn">
+                    <span id="loginText">Acessar Dashboard</span>
+                    <span class="loading hidden" id="loginLoading"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="dashboard-header">
+            <div class="container dashboard-header-container">
+                <div class="dashboard-logo" id="dashboardLogo">
+                    <h1><span class="black" id="dashboardLogoFirst">TARGET</span> <span class="red" id="dashboardLogoSecond">FIT</span> Dashboard</h1>
+                </div>
+                <div class="dashboard-nav">
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar">A</div>
+                        <span id="userEmail">admin@targetfit.com</span>
+                    </div>
+                    <button class="logout-btn" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> <span>Sair</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="container">
+                <!-- Botões de Configuração -->
+                <div class="config-buttons">
+                    <button class="btn-config" id="openConfigBtn">
+                        <i class="fas fa-cog"></i> Configurações da Página
+                    </button>
+                    <button class="btn-config" id="toggleCompanyProfileBtn">
+                        <i class="fas fa-eye"></i> Mostrar/Ocultar Perfil
+                    </button>
+                </div>
+
+                <!-- Abas do Dashboard -->
+                <div class="dashboard-tabs" id="dashboardTabs">
+                    <button class="dashboard-tab active" data-tab="plans">
+                        <i class="fas fa-dumbbell"></i> Planos
+                    </button>
+                    <button class="dashboard-tab" data-tab="employees">
+                        <i class="fas fa-users"></i> Funcionários
+                    </button>
+                    <button class="dashboard-tab" data-tab="candidates">
+                        <i class="fas fa-briefcase"></i> Candidatos
+                    </button>
+                    <button class="dashboard-tab" data-tab="access">
+                        <i class="fas fa-key"></i> Acessos
+                    </button>
+                    <button class="dashboard-tab" data-tab="comments">
+                        <i class="fas fa-comments"></i> Avaliações
+                    </button>
+                    <button class="dashboard-tab" data-tab="hiddenRoles">
+                        <i class="fas fa-eye-slash"></i> Cargos Ocultos
+                    </button>
+                </div>
+
+                <!-- Conteúdo das Abas -->
+
+                <!-- Aba: Planos -->
+                <div class="tab-content active" id="plansTab">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-title">
+                            <span>Gerenciar Planos</span>
+                            <button class="btn-plan" id="addPlanBtn">
+                                <i class="fas fa-plus"></i> Novo Plano
+                            </button>
+                        </div>
+                        <div id="dashboardPlansList">
+                            <!-- Planos do dashboard serão carregados aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba: Funcionários -->
+                <div class="tab-content" id="employeesTab">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-title">
+                            <span>Gerenciar Funcionários</span>
+                            <button class="btn-plan" id="addEmployeeBtn">
+                                <i class="fas fa-plus"></i> Novo Funcionário
+                            </button>
+                        </div>
+                        <div id="dashboardEmployeesList">
+                            <!-- Funcionários do dashboard serão carregados aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba: Candidatos -->
+                <div class="tab-content" id="candidatesTab">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-title">
+                            <span>Candidatos (Trabalhe Conosco)</span>
+                        </div>
+                        <div class="candidates-list" id="candidatesList">
+                            <!-- Candidatos serão carregados aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba: Acessos -->
+                <div class="tab-content" id="accessTab">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-title">
+                            <span>Gerenciar Acessos ao Dashboard</span>
+                            <button class="btn-plan" id="addAccessBtn">
+                                <i class="fas fa-plus"></i> Novo Acesso
+                            </button>
+                        </div>
+                        <div class="access-list" id="accessList">
+                            <!-- Lista de acessos será carregada aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba: Avaliações com Filtro -->
+                <div class="tab-content" id="commentsTab">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-title">
+                            <span>Avaliações dos Clientes</span>
+                        </div>
+
+                        <!-- Filtro de Avaliações -->
+                        <div class="comments-filter">
+                            <input type="text" id="filterComments" placeholder="Filtrar por nome do aluno ou funcionário..." class="form-control">
+                            <button class="btn-plan" id="clearFilterBtn">
+                                <i class="fas fa-times"></i> Limpar
+                            </button>
+                        </div>
+
+                        <div id="dashboardCommentsList">
+                            <!-- Avaliações serão carregadas aqui -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba: Cargos Ocultos -->
+                <div class="tab-content" id="hiddenRolesTab">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-title">
+                            <span>Cargos Ocultos na Tela do Aluno</span>
+                            <button class="btn-plan" id="refreshHiddenRolesBtn">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                        </div>
+                        <div id="hiddenRolesList">
+                            <!-- Cargos ocultos serão carregados aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <div class="footer-logo">
+                        <span class="black" id="footerLogoFirst">TARGET</span> <span class="red" id="footerLogoSecond">FIT</span>
+                    </div>
+                    <p id="footerDescription">Transformamos vidas através do fitness com equipamentos de última geração, profissionais qualificados e um ambiente motivador.</p>
+                    <a href="#" class="btn-whatsapp-company" id="footerWhatsAppBtn" style="margin-top: 15px;">
+                        <i class="fab fa-whatsapp"></i> WhatsApp da Empresa
+                    </a>
+                </div>
+                <div class="footer-links">
+                    <h3>Links Rápidos</h3>
+                    <ul>
+                        <li><a href="#plans">Planos</a></li>
+                        <li><a href="#employees">Nossa Equipe</a></li>
+                        <li><a href="#" id="footerWorkWithUsBtn">Trabalhe Conosco</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h3>Contato</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> <span id="footerAddress">Av. Giovanni Gronchi, 1060 - Morumbi</span></p>
+                    <p><i class="fas fa-phone"></i> <span id="footerPhone">11959749844</span></p>
+                    <p><i class="fas fa-envelope"></i> <span id="footerEmail">Targetpalacio@gmail.com</span></p>
+                    <p><i class="fas fa-clock"></i> <span id="footerHours">Seg a Sexta 5:30 - 00H | Sabado 8h - 18h | Domingo 8h - 14h  </span></p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; <span id="currentYear">2026</span> <span id="footerCompanyName">TARGET FIT</span> Academia. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ============================
+        // CONFIGURAÇÃO FIREBASE COM REALTIME DATABASE
+        // ============================
+
+        // VARIÁVEIS GLOBAIS
+        let firebaseApp = null;
+        let firebaseAuth = null;
+        let database = null;
+        let storage = null;
+
+        // Referências do Realtime Database
+        let plansRef = null;
+        let employeesRef = null;
+        let ratingsRef = null;
+        let configRef = null;
+        let usersRef = null;
+        let candidatesRef = null;
+        let hiddenRolesRef = null;
+        let companyProfileRef = null;
+        let footerConfigRef = null;
+        let pressConfigRef = null;
+
+        // Estado da aplicação
+        const AppState = {
+            currentEmployeeId: null,
+            isLoggedIn: false,
+            currentUser: null,
+            isLoading: false,
+            config: {
+                // Configurações gerais
+                pageTitle: "TARGET FIT - Academia Premium",
+                logoFirst: "TARGET",
+                logoSecond: "FIT",
+                companyName: "Target Fit",
+                companyPhoto: "https://i.imgur.com/placeholder.png",
+                companyDescription: "Transformamos vidas através do fitness com equipamentos de última geração, profissionais qualificados e um ambiente motivador.",
+                companyBiography: "",
+
+                // Textos da página
+                welcomeTitle: "Olá Seja bem Vindo a Target Fit",
+                welcomeSubtitle: "Transforme seu corpo, transforme sua vida!",
+                heroTitle: "Transforme seu corpo, transforme sua vida",
+                heroDescription: "Na TARGET FIT, oferecemos os melhores equipamentos, profissionais qualificados e um ambiente motivador para você alcançar seus objetivos.",
+                plansSubtitle: "Escolha o plano ideal para sua jornada fitness",
+                employeesSubtitle: "Profissionais qualificados para te acompanhar",
+                sidebarText: "Transforme seu corpo, transforme sua vida",
+
+                // WhatsApp
+                whatsAppNumber: "5511959749844",
+                planMessage: "Olá, gostaria de informações sobre o plano [PLANO]",
+                contactMessage: "Olá, gostaria de mais informações sobre a academia!",
+
+                // Footer
+                footerAddress: "Av. Giovanni Gronchi, 1060 - Morumbi",
+                footerPhone: "11959749844",
+                footerEmail: "Targetpalacio@gmail.com",
+                footerHours: "Seg a Sexta 5:30 - 00H | Sabado 8h - 18h | Domingo 8h - 14h",
+
+                // Imprensa
+                pressImage: "",
+                pressTitle: "Na Mídia",
+                pressDescription: ""
+            },
+            employees: [],
+            plans: [],
+            ratings: [],
+            users: [],
+            candidates: [],
+            hiddenRoles: [],
+            companyProfileVisible: false,
+            currentFilter: 'all'
+        };
+
+        // Cache de elementos DOM
+        const DOMCache = {};
+
+        // ============================
+        // INICIALIZAÇÃO
+        // ============================
+
+        async function initializeApp() {
+            console.log('🚀 Inicializando aplicação...');
+
+            try {
+                // 1. Verificar se Firebase está carregado
+                if (typeof firebase === 'undefined') {
+                    showError('Firebase não carregado! Recarregue a página.');
+                    return;
+                }
+
+                console.log('✅ Firebase carregado. Versão:', firebase.SDK_VERSION);
+
+                // 2. Cachear elementos DOM
+                cacheDOMElements();
+
+                // 3. Configurar event listeners
+                setupEventListeners();
+
+                // 4. Configurar ano atual no footer
+                document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+                // 5. Configurar data máxima para nascimento (18 anos atrás)
+                const today = new Date();
+                const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+                document.getElementById('birthDate').max = maxDate.toISOString().split('T')[0];
+
+                // 6. Inicializar Firebase
+                await initializeFirebase();
+
+                // 7. Carregar configurações
+                await loadConfig();
+
+                // 8. Verificar autenticação
+                await checkAuthState();
+
+                // 9. Carregar dados iniciais se não estiver logado
+                if (!AppState.isLoggedIn) {
+                    await loadInitialData();
+                }
+
+                // 10. Mostrar mensagem de boas-vindas
+                setTimeout(() => {
+                    showWelcomeMessage();
+                }, 1000);
+
+                console.log('🎉 Aplicação inicializada com sucesso!');
+
+            } catch (error) {
+                console.error('❌ Erro na inicialização:', error);
+                showError('Erro ao inicializar a aplicação: ' + error.message);
+            }
+        }
+
+        async function initializeFirebase() {
+            try {
+                console.log('🔥 Inicializando Firebase com Realtime Database...');
+
+                // Configuração do Firebase
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDnIzOyu7m_ifxsXh1_H-3rNwiTIQDa-V8",
+                    authDomain: "target-cdf0d.firebaseapp.com",
+                    databaseURL: "https://target-cdf0d-default-rtdb.firebaseio.com",
+                    projectId: "target-cdf0d",
+                    storageBucket: "target-cdf0d.firebasestorage.app",
+                    messagingSenderId: "392644772030",
+                    appId: "1:392644772030:web:b0e094a3ec109e59dc9eef"
+                };
+
+                // Inicializar Firebase
+                firebaseApp = firebase.initializeApp(firebaseConfig);
+                firebaseAuth = firebase.auth();
+                database = firebase.database();
+                storage = firebase.storage();
+
+                console.log('✅ Firebase inicializado com sucesso!');
+
+                // Configurar referências
+                plansRef = database.ref('plans');
+                employeesRef = database.ref('employees');
+                ratingsRef = database.ref('ratings');
+                configRef = database.ref('config');
+                usersRef = database.ref('users');
+                candidatesRef = database.ref('candidates');
+                hiddenRolesRef = database.ref('hiddenRoles');
+                companyProfileRef = database.ref('companyProfileVisible');
+                footerConfigRef = database.ref('footerConfig');
+                pressConfigRef = database.ref('pressConfig');
+
+                // Testar conexão
+                await testDatabaseConnection();
+
+                return true;
+
+            } catch (error) {
+                console.error('❌ Erro ao inicializar Firebase:', error);
+                showError('Erro ao conectar com o banco de dados: ' + error.message);
+                return false;
+            }
+        }
+
+        async function testDatabaseConnection() {
+            try {
+                console.log('🔍 Testando conexão com Realtime Database...');
+
+                // Teste simples
+                await database.ref('test/connection').set({
+                    message: 'Conexão estabelecida',
+                    timestamp: Date.now()
+                });
+
+                console.log('✅ Conexão com Realtime Database estabelecida!');
+
+                // Remover dados de teste após 5 segundos
+                setTimeout(() => {
+                    database.ref('test').remove();
+                }, 5000);
+
+                return true;
+
+            } catch (error) {
+                console.error('❌ Erro na conexão com o banco de dados:', error);
+                return false;
+            }
+        }
+
+        function cacheDOMElements() {
+            // Elementos principais
+            DOMCache.menuToggle = document.getElementById('menuToggle');
+            DOMCache.sidebar = document.getElementById('sidebar');
+            DOMCache.overlay = document.getElementById('overlay');
+            DOMCache.closeSidebar = document.getElementById('closeSidebar');
+            DOMCache.homeLogo = document.getElementById('homeLogo');
+            DOMCache.welcomeContainer = document.getElementById('welcomeContainer');
+            DOMCache.welcomeTitle = document.getElementById('welcomeTitle');
+            DOMCache.welcomeSubtitle = document.getElementById('welcomeSubtitle');
+            DOMCache.heroTitle = document.getElementById('heroTitle');
+            DOMCache.heroDescription = document.getElementById('heroDescription');
+            DOMCache.heroHighlight = document.getElementById('heroHighlight');
+            DOMCache.plansSubtitle = document.getElementById('plansSubtitle');
+            DOMCache.employeesSubtitle = document.getElementById('employeesSubtitle');
+            DOMCache.sidebarFooterText = document.getElementById('sidebarFooterText');
+
+            // Botão de Suporte
+            DOMCache.supportBtn = document.getElementById('supportBtn');
+
+            // Navegação
+            DOMCache.whatsappBtn = document.getElementById('whatsappBtn');
+            DOMCache.workWithUsSidebarBtn = document.getElementById('workWithUsSidebarBtn');
+            DOMCache.dashboardBtn = document.getElementById('dashboardBtn');
+            DOMCache.footerWorkWithUsBtn = document.getElementById('footerWorkWithUsBtn');
+            DOMCache.footerWhatsAppBtn = document.getElementById('footerWhatsAppBtn');
+
+            // Seções
+            DOMCache.plansContainer = document.getElementById('plansContainer');
+            DOMCache.employeesList = document.getElementById('employeesList');
+            DOMCache.roleFilterContainer = document.getElementById('roleFilterContainer');
+
+            // Modal de avaliação
+            DOMCache.ratingModal = document.getElementById('ratingModal');
+            DOMCache.closeRatingModal = document.getElementById('closeRatingModal');
+            DOMCache.cancelRatingBtn = document.getElementById('cancelRatingBtn');
+            DOMCache.ratingForm = document.getElementById('ratingForm');
+            DOMCache.ratingEmployeeInfo = document.getElementById('ratingEmployeeInfo');
+            DOMCache.submitRatingBtn = document.getElementById('submitRatingBtn');
+            DOMCache.submitRatingText = document.getElementById('submitRatingText');
+            DOMCache.submitRatingLoading = document.getElementById('submitRatingLoading');
+
+            // Modal de comentários
+            DOMCache.commentsModal = document.getElementById('commentsModal');
+            DOMCache.closeCommentsModal = document.getElementById('closeCommentsModal');
+            DOMCache.closeCommentsBtn = document.getElementById('closeCommentsBtn');
+            DOMCache.commentsModalTitle = document.getElementById('commentsModalTitle');
+            DOMCache.commentsModalSubtitle = document.getElementById('commentsModalSubtitle');
+            DOMCache.commentsEmployeeInfo = document.getElementById('commentsEmployeeInfo');
+            DOMCache.commentsList = document.getElementById('commentsList');
+
+            // Modal trabalhe conosco
+            DOMCache.workModal = document.getElementById('workModal');
+            DOMCache.closeWorkModal = document.getElementById('closeWorkModal');
+            DOMCache.closeWorkOptionsBtn = document.getElementById('closeWorkOptionsBtn');
+            DOMCache.workOptions = document.querySelectorAll('.work-option');
+
+            // Modal formulário trabalhe conosco
+            DOMCache.workFormModal = document.getElementById('workFormModal');
+            DOMCache.closeWorkFormModal = document.getElementById('closeWorkFormModal');
+            DOMCache.cancelWorkFormBtn = document.getElementById('cancelWorkFormBtn');
+            DOMCache.workForm = document.getElementById('workForm');
+            DOMCache.submitWorkFormBtn = document.getElementById('submitWorkFormBtn');
+            DOMCache.submitWorkFormText = document.getElementById('submitWorkFormText');
+            DOMCache.submitWorkFormLoading = document.getElementById('submitWorkFormLoading');
+            DOMCache.selectedRole = document.getElementById('selectedRole');
+
+            // Modal de configurações
+            DOMCache.configModal = document.getElementById('configModal');
+            DOMCache.closeConfigModal = document.getElementById('closeConfigModal');
+            DOMCache.cancelConfigBtn = document.getElementById('cancelConfigBtn');
+            DOMCache.openConfigBtn = document.getElementById('openConfigBtn');
+            DOMCache.configForm = document.getElementById('configForm');
+            DOMCache.saveConfigBtn = document.getElementById('saveConfigBtn');
+            DOMCache.saveConfigText = document.getElementById('saveConfigText');
+            DOMCache.saveConfigLoading = document.getElementById('saveConfigLoading');
+
+            // Login
+            DOMCache.loginContainer = document.getElementById('loginContainer');
+            DOMCache.loginForm = document.getElementById('loginForm');
+            DOMCache.loginError = document.getElementById('loginError');
+            DOMCache.loginBtn = document.getElementById('loginBtn');
+            DOMCache.loginText = document.getElementById('loginText');
+            DOMCache.loginLoading = document.getElementById('loginLoading');
+            DOMCache.loginLogoFirst = document.getElementById('loginLogoFirst');
+            DOMCache.loginLogoSecond = document.getElementById('loginLogoSecond');
+
+            // Dashboard
+            DOMCache.dashboard = document.getElementById('dashboard');
+            DOMCache.logoutBtn = document.getElementById('logoutBtn');
+            DOMCache.dashboardLogo = document.getElementById('dashboardLogo');
+            DOMCache.dashboardLogoFirst = document.getElementById('dashboardLogoFirst');
+            DOMCache.dashboardLogoSecond = document.getElementById('dashboardLogoSecond');
+            DOMCache.userAvatar = document.getElementById('userAvatar');
+            DOMCache.userEmail = document.getElementById('userEmail');
+            DOMCache.toggleCompanyProfileBtn = document.getElementById('toggleCompanyProfileBtn');
+
+            // Abas do Dashboard
+            DOMCache.dashboardTabs = document.getElementById('dashboardTabs');
+            DOMCache.dashboardPlansList = document.getElementById('dashboardPlansList');
+            DOMCache.dashboardEmployeesList = document.getElementById('dashboardEmployeesList');
+            DOMCache.dashboardCommentsList = document.getElementById('dashboardCommentsList');
+            DOMCache.candidatesList = document.getElementById('candidatesList');
+            DOMCache.accessList = document.getElementById('accessList');
+            DOMCache.filterComments = document.getElementById('filterComments');
+            DOMCache.clearFilterBtn = document.getElementById('clearFilterBtn');
+            DOMCache.hiddenRolesList = document.getElementById('hiddenRolesList');
+            DOMCache.refreshHiddenRolesBtn = document.getElementById('refreshHiddenRolesBtn');
+
+            // Botões do Dashboard
+            DOMCache.addPlanBtn = document.getElementById('addPlanBtn');
+            DOMCache.addEmployeeBtn = document.getElementById('addEmployeeBtn');
+            DOMCache.addAccessBtn = document.getElementById('addAccessBtn');
+
+            // Footer
+            DOMCache.footerDescription = document.getElementById('footerDescription');
+            DOMCache.footerAddress = document.getElementById('footerAddress');
+            DOMCache.footerPhone = document.getElementById('footerPhone');
+            DOMCache.footerEmail = document.getElementById('footerEmail');
+            DOMCache.footerHours = document.getElementById('footerHours');
+            DOMCache.footerCompanyName = document.getElementById('footerCompanyName');
+            DOMCache.footerLogoFirst = document.getElementById('footerLogoFirst');
+            DOMCache.footerLogoSecond = document.getElementById('footerLogoSecond');
+            DOMCache.sidebarTitle = document.getElementById('sidebarTitle');
+            DOMCache.logoFirst = document.getElementById('logoFirst');
+            DOMCache.logoSecond = document.getElementById('logoSecond');
+            DOMCache.pageTitle = document.getElementById('pageTitle');
+        }
+
+        function setupEventListeners() {
+            // Menu lateral
+            DOMCache.menuToggle.addEventListener('click', openSidebar);
+            DOMCache.closeSidebar.addEventListener('click', closeSidebar);
+            DOMCache.overlay.addEventListener('click', closeSidebar);
+            DOMCache.homeLogo.addEventListener('click', () => scrollToSection('hero'));
+
+            // Botão de Suporte
+            DOMCache.supportBtn.addEventListener('click', () => openWhatsApp('contact'));
+
+            // Navegação
+            DOMCache.whatsappBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeSidebar();
+                openWhatsApp('contact');
+            });
+
+            DOMCache.workWithUsSidebarBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeSidebar();
+                openWorkModal();
+            });
+
+            DOMCache.dashboardBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeSidebar();
+                showDashboard();
+            });
+
+            DOMCache.footerWorkWithUsBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openWorkModal();
+            });
+
+            DOMCache.footerWhatsAppBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openWhatsApp('contact');
+            });
+
+            // Modal de avaliação
+            DOMCache.closeRatingModal.addEventListener('click', closeRatingModal);
+            DOMCache.cancelRatingBtn.addEventListener('click', closeRatingModal);
+            DOMCache.ratingForm.addEventListener('submit', handleRatingSubmit);
+
+            // Modal de comentários
+            DOMCache.closeCommentsModal.addEventListener('click', closeCommentsModal);
+            DOMCache.closeCommentsBtn.addEventListener('click', closeCommentsModal);
+
+            // Modal trabalhe conosco
+            DOMCache.closeWorkModal.addEventListener('click', closeWorkModal);
+            DOMCache.closeWorkOptionsBtn.addEventListener('click', closeWorkModal);
+
+            // Opções de trabalho
+            DOMCache.workOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const role = option.dataset.role;
+                    openWorkFormModal(role);
+                });
+            });
+
+            // Modal formulário trabalhe conosco
+            DOMCache.closeWorkFormModal.addEventListener('click', closeWorkFormModal);
+            DOMCache.cancelWorkFormBtn.addEventListener('click', closeWorkFormModal);
+            DOMCache.workForm.addEventListener('submit', handleWorkFormSubmit);
+
+            // Modal de configurações
+            DOMCache.openConfigBtn.addEventListener('click', openConfigModal);
+            DOMCache.closeConfigModal.addEventListener('click', closeConfigModal);
+            DOMCache.cancelConfigBtn.addEventListener('click', closeConfigModal);
+            DOMCache.configForm.addEventListener('submit', handleConfigSubmit);
+
+            // Config tabs
+            document.querySelectorAll('.config-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    switchConfigTab(tabId);
+                });
+            });
+
+            // Estrelas de avaliação
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('rating-star-large')) {
+                    const value = parseInt(e.target.getAttribute('data-value'));
+                    setRating(value);
+                }
+            });
+
+            // Login
+            DOMCache.loginForm.addEventListener('submit', handleLogin);
+
+            // Dashboard
+            DOMCache.logoutBtn.addEventListener('click', handleLogout);
+            DOMCache.dashboardLogo.addEventListener('click', () => {
+                if (AppState.isLoggedIn) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            });
+
+            DOMCache.toggleCompanyProfileBtn.addEventListener('click', toggleCompanyProfile);
+            DOMCache.refreshHiddenRolesBtn.addEventListener('click', loadHiddenRoles);
+
+            // Abas do Dashboard
+            DOMCache.dashboardTabs.addEventListener('click', (e) => {
+                if (e.target.closest('.dashboard-tab')) {
+                    const tab = e.target.closest('.dashboard-tab');
+                    const tabId = tab.dataset.tab;
+                    switchTab(tabId);
+                }
+            });
+
+            // Filtro de comentários
+            DOMCache.filterComments.addEventListener('input', filterComments);
+            DOMCache.clearFilterBtn.addEventListener('click', () => {
+                DOMCache.filterComments.value = '';
+                filterComments();
+            });
+
+            // Botões do Dashboard
+            DOMCache.addPlanBtn.addEventListener('click', addPlan);
+            DOMCache.addEmployeeBtn.addEventListener('click', addEmployee);
+            DOMCache.addAccessBtn.addEventListener('click', addAccess);
+
+            // Boas-vindas
+            DOMCache.welcomeContainer.addEventListener('click', () => {
+                DOMCache.welcomeContainer.style.display = 'none';
+            });
+
+            // Event listeners para botões dinâmicos
+            document.addEventListener('click', (e) => {
+                // Filtro de cargo
+                if (e.target.classList.contains('filter-btn')) {
+                    const btn = e.target;
+                    const role = btn.dataset.role;
+                    filterEmployeesByRole(role);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                // Botões de avaliação nos cards de funcionários
+                if (e.target.closest('.btn-rate-employee')) {
+                    const btn = e.target.closest('.btn-rate-employee');
+                    const employeeId = btn.dataset.id;
+                    openRatingModal(employeeId);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                // Botões de ver comentários
+                if (e.target.closest('.btn-view-comments')) {
+                    const btn = e.target.closest('.btn-view-comments');
+                    const employeeId = btn.dataset.id;
+                    openCommentsModal(employeeId);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+
+                // Botões de contratar plano
+                if (e.target.closest('.btn-plan')) {
+                    const btn = e.target.closest('.btn-plan');
+                    if (!btn.id && btn.dataset.id) {
+                        const planId = btn.dataset.id;
+                        const planName = btn.dataset.name;
+                        openWhatsApp('plan', planName);
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                }
+
+                // Botões de ação no dashboard
+                if (e.target.closest('.btn-action')) {
+                    const btn = e.target.closest('.btn-action');
+                    const action = btn.dataset.action;
+                    const id = btn.dataset.id;
+                    const role = btn.dataset.role;
+
+                    if (action === 'editPlan') editPlan(id);
+                    if (action === 'deletePlan') deletePlan(id);
+                    if (action === 'togglePromotion') togglePlanPromotion(id);
+                    if (action === 'editEmployee') editEmployee(id);
+                    if (action === 'deleteEmployee') deleteEmployee(id);
+                    if (action === 'toggleVerified') toggleEmployeeVerified(id);
+                    if (action === 'deleteComment') deleteComment(id);
+                    if (action === 'deleteCandidate') deleteCandidate(id);
+                    if (action === 'contactCandidate') contactCandidate(id);
+                    if (action === 'deleteAccess') deleteAccess(id);
+                    if (action === 'showRole' && role) showRole(role);
+                }
+
+                // Botões WhatsApp dos candidatos
+                if (e.target.closest('.btn-whatsapp') && e.target.closest('.btn-whatsapp').dataset.phone) {
+                    const btn = e.target.closest('.btn-whatsapp');
+                    const phone = btn.dataset.phone;
+                    openCandidateWhatsApp(phone);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            });
+        }
+
+        // ============================
+        // CONFIGURAÇÕES
+        // ============================
+
+        async function loadConfig() {
+            try {
+                // Carregar configurações gerais
+                configRef.on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        AppState.config = { ...AppState.config, ...data };
+                        updateConfigUI();
+                    }
+                });
+
+                // Carregar visibilidade do perfil da empresa
+                companyProfileRef.on('value', (snapshot) => {
+                    AppState.companyProfileVisible = snapshot.val() || false;
+                });
+
+                // Carregar cargos ocultos
+                hiddenRolesRef.on('value', (snapshot) => {
+                    AppState.hiddenRoles = [];
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        Object.keys(data).forEach(key => {
+                            AppState.hiddenRoles.push({ id: key, ...data[key] });
+                        });
+                    }
+                    renderRoleFilters();
+                    renderEmployees();
+
+                    if (AppState.isLoggedIn) {
+                        renderHiddenRoles();
+                    }
+                });
+
+                // Carregar configurações do footer
+                footerConfigRef.on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        AppState.config = { ...AppState.config, ...data };
+                        updateFooterUI();
+                    }
+                });
+
+                // Carregar configurações da imprensa
+                pressConfigRef.on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        AppState.config = { ...AppState.config, ...data };
+                        updatePressUI();
+                    }
+                });
+
+            } catch (error) {
+                console.error('❌ Erro ao carregar configurações:', error);
+            }
+        }
+
+        async function saveConfig() {
+            try {
+                // Separar configurações por categoria
+                const generalConfig = {
+                    pageTitle: document.getElementById('configPageTitle').value,
+                    logoFirst: document.getElementById('configLogoFirst').value,
+                    logoSecond: document.getElementById('configLogoSecond').value
+                };
+
+                const textConfig = {
+                    welcomeTitle: document.getElementById('configWelcomeTitle').value,
+                    welcomeSubtitle: document.getElementById('configWelcomeSubtitle').value,
+                    heroTitle: document.getElementById('configHeroTitle').value,
+                    heroDescription: document.getElementById('configHeroDescription').value,
+                    plansSubtitle: document.getElementById('configPlansSubtitle').value,
+                    employeesSubtitle: document.getElementById('configEmployeesSubtitle').value,
+                    sidebarText: document.getElementById('configSidebarText').value
+                };
+
+                const whatsappConfig = {
+                    whatsAppNumber: document.getElementById('configWhatsAppNumber').value,
+                    planMessage: document.getElementById('configPlanMessage').value,
+                    contactMessage: document.getElementById('configContactMessage').value
+                };
+
+                const companyConfig = {
+                    companyName: document.getElementById('configCompanyName').value,
+                    companyPhoto: document.getElementById('configCompanyPhoto').value,
+                    companyDescription: document.getElementById('configCompanyDescription').value,
+                    companyBiography: document.getElementById('configCompanyBiography').value
+                };
+
+                const footerConfig = {
+                    footerAddress: document.getElementById('configFooterAddress').value,
+                    footerPhone: document.getElementById('configFooterPhone').value,
+                    footerEmail: document.getElementById('configFooterEmail').value,
+                    footerHours: document.getElementById('configFooterHours').value
+                };
+
+                const pressConfig = {
+                    pressImage: document.getElementById('configPressImage').value,
+                    pressTitle: document.getElementById('configPressTitle').value,
+                    pressDescription: document.getElementById('configPressDescription').value
+                };
+
+                // Salvar no Firebase
+                await configRef.set({ ...generalConfig, ...textConfig, ...whatsappConfig, ...companyConfig });
+                await footerConfigRef.set(footerConfig);
+                await pressConfigRef.set(pressConfig);
+
+                // Atualizar estado local
+                AppState.config = { 
+                    ...AppState.config, 
+                    ...generalConfig, 
+                    ...textConfig, 
+                    ...whatsappConfig, 
+                    ...companyConfig,
+                    ...footerConfig,
+                    ...pressConfig 
+                };
+
+                updateConfigUI();
+                updateFooterUI();
+                updatePressUI();
+                closeConfigModal();
+                showSuccess('Configurações salvas com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao salvar configurações:', error);
+                showError('Erro ao salvar configurações');
+            }
+        }
+
+        function updateConfigUI() {
+            // Atualizar título da página
+            document.title = AppState.config.pageTitle;
+            DOMCache.pageTitle.textContent = AppState.config.pageTitle;
+
+            // Atualizar logos
+            DOMCache.logoFirst.textContent = AppState.config.logoFirst;
+            DOMCache.logoSecond.textContent = AppState.config.logoSecond;
+            DOMCache.loginLogoFirst.textContent = AppState.config.logoFirst;
+            DOMCache.loginLogoSecond.textContent = AppState.config.logoSecond;
+            DOMCache.dashboardLogoFirst.textContent = AppState.config.logoFirst;
+            DOMCache.dashboardLogoSecond.textContent = AppState.config.logoSecond;
+            DOMCache.footerLogoFirst.textContent = AppState.config.logoFirst;
+            DOMCache.footerLogoSecond.textContent = AppState.config.logoSecond;
+            DOMCache.footerCompanyName.textContent = `${AppState.config.logoFirst} ${AppState.config.logoSecond}`;
+            DOMCache.sidebarTitle.textContent = `${AppState.config.logoFirst} ${AppState.config.logoSecond}`;
+
+            // Atualizar textos
+            DOMCache.welcomeTitle.textContent = AppState.config.welcomeTitle;
+            DOMCache.welcomeSubtitle.textContent = AppState.config.welcomeSubtitle;
+
+            // Separar título do hero (parte antes e depois da vírgula)
+            const heroTitleParts = AppState.config.heroTitle.split(', ');
+            if (heroTitleParts.length >= 2) {
+                DOMCache.heroTitle.innerHTML = `${heroTitleParts[0]}, <span class="highlight">${heroTitleParts[1]}</span>`;
+            } else {
+                DOMCache.heroTitle.textContent = AppState.config.heroTitle;
+            }
+
+            DOMCache.heroDescription.textContent = AppState.config.heroDescription;
+            DOMCache.plansSubtitle.textContent = AppState.config.plansSubtitle;
+            DOMCache.employeesSubtitle.textContent = AppState.config.employeesSubtitle;
+            DOMCache.sidebarFooterText.textContent = AppState.config.sidebarText;
+            DOMCache.footerDescription.textContent = AppState.config.companyDescription;
+
+            // Atualizar inputs do modal de configuração
+            document.getElementById('configPageTitle').value = AppState.config.pageTitle;
+            document.getElementById('configLogoFirst').value = AppState.config.logoFirst;
+            document.getElementById('configLogoSecond').value = AppState.config.logoSecond;
+            document.getElementById('configWelcomeTitle').value = AppState.config.welcomeTitle;
+            document.getElementById('configWelcomeSubtitle').value = AppState.config.welcomeSubtitle;
+            document.getElementById('configHeroTitle').value = AppState.config.heroTitle;
+            document.getElementById('configHeroDescription').value = AppState.config.heroDescription;
+            document.getElementById('configPlansSubtitle').value = AppState.config.plansSubtitle;
+            document.getElementById('configEmployeesSubtitle').value = AppState.config.employeesSubtitle;
+            document.getElementById('configSidebarText').value = AppState.config.sidebarText;
+            document.getElementById('configWhatsAppNumber').value = AppState.config.whatsAppNumber;
+            document.getElementById('configPlanMessage').value = AppState.config.planMessage;
+            document.getElementById('configContactMessage').value = AppState.config.contactMessage;
+            document.getElementById('configCompanyName').value = AppState.config.companyName;
+            document.getElementById('configCompanyPhoto').value = AppState.config.companyPhoto;
+            document.getElementById('configCompanyDescription').value = AppState.config.companyDescription;
+            document.getElementById('configCompanyBiography').value = AppState.config.companyBiography;
+            document.getElementById('configFooterAddress').value = AppState.config.footerAddress;
+            document.getElementById('configFooterPhone').value = AppState.config.footerPhone;
+            document.getElementById('configFooterEmail').value = AppState.config.footerEmail;
+            document.getElementById('configFooterHours').value = AppState.config.footerHours;
+            document.getElementById('configPressImage').value = AppState.config.pressImage;
+            document.getElementById('configPressTitle').value = AppState.config.pressTitle;
+            document.getElementById('configPressDescription').value = AppState.config.pressDescription;
+        }
+
+        function updateFooterUI() {
+            DOMCache.footerAddress.textContent = AppState.config.footerAddress;
+            DOMCache.footerPhone.textContent = AppState.config.footerPhone;
+            DOMCache.footerEmail.textContent = AppState.config.footerEmail;
+            DOMCache.footerHours.textContent = AppState.config.footerHours;
+        }
+
+        function updatePressUI() {
+            // Esta função pode ser expandida para exibir a seção de imprensa
+            // quando necessário
+        }
+
+        function showWelcomeMessage() {
+            DOMCache.welcomeContainer.style.display = 'block';
+            setTimeout(() => {
+                DOMCache.welcomeContainer.style.display = 'none';
+            }, 5000);
+        }
+
+        // ============================
+        // FILTROS
+        // ============================
+
+        function filterEmployeesByRole(role) {
+            AppState.currentFilter = role;
+
+            // Atualizar botões ativos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.role === role) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Filtrar e renderizar funcionários
+            renderEmployees();
+        }
+
+        function filterComments() {
+            const filterText = DOMCache.filterComments.value.toLowerCase();
+
+            if (!filterText) {
+                loadDashboardComments();
+                return;
+            }
+
+            let html = '';
+            const filteredRatings = AppState.ratings.filter(rating => {
+                const employee = AppState.employees.find(e => e.id === rating.employeeId);
+                const employeeName = employee ? employee.name.toLowerCase() : '';
+                const studentName = (rating.studentName || '').toLowerCase();
+
+                return studentName.includes(filterText) || employeeName.includes(filterText);
+            });
+
+            if (filteredRatings.length > 0) {
+                filteredRatings.forEach(rating => {
+                    const employee = AppState.employees.find(e => e.id === rating.employeeId);
+                    html += `
+                        <div class="dashboard-plan-item">
+                            <div class="dashboard-plan-header">
+                                <div>
+                                    <h4 class="dashboard-plan-name">${rating.studentName || 'Anônimo'}</h4>
+                                    <p class="dashboard-plan-price">Avaliou: ${employee ? employee.name : 'Funcionário'}</p>
+                                    <div class="dashboard-plan-features">
+                                        <span class="dashboard-plan-feature">${'★'.repeat(rating.rating || 0)}${'☆'.repeat(5-(rating.rating || 0))}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dashboard-plan-details">
+                                <p>${rating.comment || 'Sem comentário'}</p>
+                                <div style="font-size: 0.8rem; color: #999; margin-top: 10px;">
+                                    ${new Date(rating.createdAt || Date.now()).toLocaleDateString('pt-BR')}
+                                </div>
+                            </div>
+                            <div class="dashboard-plan-actions">
+                                <button class="btn-action btn-delete" data-action="deleteComment" data-id="${rating.id}">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html = '<p style="text-align: center; color: #999; font-style: italic;">Nenhuma avaliação encontrada com este filtro.</p>';
+            }
+
+            DOMCache.dashboardCommentsList.innerHTML = html;
+        }
+
+        // ============================
+        // WHATSAPP
+        // ============================
+
+        function openWhatsApp(type, planName = '') {
+            const whatsappNumber = AppState.config.whatsAppNumber || '5511959749844';
+            let message = '';
+
+            if (type === 'plan' && planName) {
+                message = AppState.config.planMessage.replace('[PLANO]', planName);
+            } else {
+                message = AppState.config.contactMessage;
+            }
+
+            const encodedMessage = encodeURIComponent(message);
+            const url = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+
+            window.open(url, '_blank');
+        }
+
+        function openCandidateWhatsApp(phone) {
+            const cleanPhone = phone.replace(/\D/g, '');
+            const url = `https://wa.me/55${cleanPhone}`;
+            window.open(url, '_blank');
+        }
+
+        // ============================
+        // AUTENTICAÇÃO
+        // ============================
+
+        async function checkAuthState() {
+            try {
+                firebaseAuth.onAuthStateChanged(async (user) => {
+                    if (user) {
+                        // Usuário está logado
+                        AppState.currentUser = user;
+                        AppState.isLoggedIn = true;
+
+                        // Atualizar UI
+                        DOMCache.userAvatar.textContent = user.email.charAt(0).toUpperCase();
+                        DOMCache.userEmail.textContent = user.email;
+
+                        // Carregar dados do dashboard
+                        await loadDashboardData();
+                        showDashboard();
+                    } else {
+                        // Usuário não está logado
+                        AppState.isLoggedIn = false;
+                        showMainPage();
+                    }
+                });
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                showMainPage();
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Validação básica
+            if (!email || !password) {
+                showLoginError('Por favor, preencha todos os campos');
+                return;
+            }
+
+            try {
+                // Mostrar loading
+                toggleLoading(DOMCache.loginBtn, DOMCache.loginText, DOMCache.loginLoading, true);
+
+                // Tentar login com Firebase
+                const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                console.log('✅ Login bem-sucedido:', userCredential.user.email);
+
+            } catch (error) {
+                console.error('❌ Erro no login:', error);
+
+                // Mensagens de erro amigáveis
+                let errorMessage = 'Erro ao fazer login. Verifique suas credenciais.';
+
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage = 'Usuário não encontrado.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage = 'Senha incorreta.';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'E-mail inválido.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Muitas tentativas. Tente novamente mais tarde.';
+                        break;
+                }
+
+                showLoginError(errorMessage);
+            } finally {
+                // Esconder loading
+                toggleLoading(DOMCache.loginBtn, DOMCache.loginText, DOMCache.loginLoading, false);
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                await firebaseAuth.signOut();
+                console.log('✅ Logout realizado com sucesso');
+            } catch (error) {
+                console.error('❌ Erro ao fazer logout:', error);
+                showError('Erro ao sair da conta');
+            }
+        }
+
+        // ============================
+        // CARREGAMENTO DE DADOS
+        // ============================
+
+        async function loadInitialData() {
+            try {
+                // Carregar planos
+                await loadPlans();
+
+                // Carregar funcionários
+                await loadEmployees();
+
+                // Carregar avaliações
+                await loadRatings();
+
+                // Carregar candidatos
+                await loadCandidates();
+
+                console.log('✅ Dados iniciais carregados com sucesso');
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados iniciais:', error);
+                loadFallbackData();
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                await Promise.all([
+                    loadPlans(),
+                    loadEmployees(),
+                    loadRatings(),
+                    loadCandidates(),
+                    loadUsers(),
+                    loadDashboardComments(),
+                    loadHiddenRoles()
+                ]);
+
+                console.log('✅ Dados do dashboard carregados com sucesso');
+            } catch (error) {
+                console.error('❌ Erro ao carregar dados do dashboard:', error);
+                showError('Erro ao carregar dados do dashboard');
+            }
+        }
+
+        async function loadPlans() {
+            try {
+                plansRef.on('value', (snapshot) => {
+                    AppState.plans = [];
+
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        Object.keys(data).forEach(key => {
+                            AppState.plans.push({ id: key, ...data[key] });
+                        });
+
+                        // Ordenar por promoção e preço
+                        AppState.plans.sort((a, b) => {
+                            if (a.promotion && !b.promotion) return -1;
+                            if (!a.promotion && b.promotion) return 1;
+                            return (a.price || 0) - (b.price || 0);
+                        });
+                    }
+
+                    renderPlans();
+
+                    if (AppState.isLoggedIn) {
+                        renderDashboardPlans();
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Erro ao carregar planos:', error);
+                showError('Erro ao carregar planos');
+            }
+        }
+
+        async function loadEmployees() {
+            try {
+                employeesRef.on('value', (snapshot) => {
+                    AppState.employees = [];
+
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        Object.keys(data).forEach(key => {
+                            AppState.employees.push({ id: key, ...data[key] });
+                        });
+
+                        // Ordenar por verificação e rating
+                        AppState.employees.sort((a, b) => {
+                            if (a.verified && !b.verified) return -1;
+                            if (!a.verified && b.verified) return 1;
+                            return (b.rating || 0) - (a.rating || 0);
+                        });
+                    }
+
+                    renderEmployees();
+                    renderRoleFilters();
+
+                    if (AppState.isLoggedIn) {
+                        renderDashboardEmployees();
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Erro ao carregar funcionários:', error);
+                showError('Erro ao carregar funcionários');
+            }
+        }
+
+        async function loadRatings() {
+            try {
+                ratingsRef.on('value', (snapshot) => {
+                    AppState.ratings = [];
+
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        Object.keys(data).forEach(key => {
+                            AppState.ratings.push({ id: key, ...data[key] });
+                        });
+
+                        updateEmployeesWithRatings();
+                    }
+
+                    if (AppState.isLoggedIn) {
+                        loadDashboardComments();
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Erro ao carregar avaliações:', error);
+            }
+        }
+
+        async function loadCandidates() {
+            try {
+                candidatesRef.on('value', (snapshot) => {
+                    AppState.candidates = [];
+
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        Object.keys(data).forEach(key => {
+                            AppState.candidates.push({ id: key, ...data[key] });
+                        });
+
+                        // Ordenar por data
+                        AppState.candidates.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    }
+
+                    if (AppState.isLoggedIn) {
+                        renderDashboardCandidates();
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Erro ao carregar candidatos:', error);
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                usersRef.on('value', (snapshot) => {
+                    AppState.users = [];
+
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        Object.keys(data).forEach(key => {
+                            AppState.users.push({ id: key, ...data[key] });
+                        });
+
+                        // Ordenar por data
+                        AppState.users.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                    }
+
+                    if (AppState.isLoggedIn) {
+                        renderDashboardUsers();
+                    }
+                });
+            } catch (error) {
+                console.error('❌ Erro ao carregar usuários:', error);
+            }
+        }
+
+        async function loadHiddenRoles() {
+            try {
+                const snapshot = await hiddenRolesRef.once('value');
+                AppState.hiddenRoles = [];
+
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    Object.keys(data).forEach(key => {
+                        AppState.hiddenRoles.push({ id: key, ...data[key] });
+                    });
+                }
+
+                renderHiddenRoles();
+            } catch (error) {
+                console.error('❌ Erro ao carregar cargos ocultos:', error);
+            }
+        }
+
+        async function loadDashboardComments() {
+            try {
+                if (!AppState.isLoggedIn) return;
+
+                let html = '';
+
+                if (AppState.ratings.length > 0) {
+                    const sortedRatings = [...AppState.ratings].sort((a, b) => 
+                        (b.createdAt || 0) - (a.createdAt || 0)
+                    );
+
+                    sortedRatings.forEach(rating => {
+                        const employee = AppState.employees.find(e => e.id === rating.employeeId);
+                        html += `
+                            <div class="dashboard-plan-item">
+                                <div class="dashboard-plan-header">
+                                    <div>
+                                        <h4 class="dashboard-plan-name">${rating.studentName || 'Anônimo'}</h4>
+                                        <p class="dashboard-plan-price">Avaliou: ${employee ? employee.name : 'Funcionário'}</p>
+                                        <div class="dashboard-plan-features">
+                                            <span class="dashboard-plan-feature">${'★'.repeat(rating.rating || 0)}${'☆'.repeat(5-(rating.rating || 0))}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dashboard-plan-details">
+                                    <p>${rating.comment || 'Sem comentário'}</p>
+                                    <div style="font-size: 0.8rem; color: #999; margin-top: 10px;">
+                                        ${new Date(rating.createdAt || Date.now()).toLocaleDateString('pt-BR')}
+                                    </div>
+                                </div>
+                                <div class="dashboard-plan-actions">
+                                    <button class="btn-action btn-delete" data-action="deleteComment" data-id="${rating.id}">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html = '<p style="text-align: center; color: #999; font-style: italic;">Nenhuma avaliação encontrada.</p>';
+                }
+
+                DOMCache.dashboardCommentsList.innerHTML = html;
+            } catch (error) {
+                console.error('❌ Erro ao carregar avaliações:', error);
+            }
+        }
+
+        // ============================
+        // RENDERIZAÇÃO
+        // ============================
+
+        function renderPlans() {
+            if (!DOMCache.plansContainer) return;
+
+            let html = '';
+
+            AppState.plans.forEach(plan => {
+                const features = plan.features || [];
+                const isPromotion = plan.promotion || false;
+
+                html += `
+                    <div class="plan-card ${isPromotion ? 'promotion' : ''} ${plan.featured ? 'featured' : ''}">
+                        ${plan.featured ? '<div class="plan-featured-badge">DESTAQUE</div>' : ''}
+                        <div class="plan-header">
+                            <h3>${plan.name || 'Plano'}</h3>
+                            <div class="plan-price-container">
+                                <div class="plan-price">
+                                    <span class="plan-currency">R$</span>${(plan.price || 0).toFixed(2)}
+                                </div>
+                                <div class="plan-period">/${plan.period || 'mensal'}</div>
+                            </div>
+                        </div>
+                        <div class="plan-body">
+                            <p class="plan-description">${plan.description || 'Plano completo para sua jornada fitness'}</p>
+                            <ul class="plan-features-list">
+                                ${features.map(feature => `
+                                    <li class="plan-feature-item">
+                                        <i class="fas fa-check"></i>
+                                        <span>${feature}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        <div class="plan-actions">
+                            <button class="btn-plan" data-id="${plan.id}" data-name="${plan.name || 'Plano'}">
+                                Contratar Plano
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            DOMCache.plansContainer.innerHTML = html || '<p class="text-center">Nenhum plano disponível no momento.</p>';
+        }
+
+        function renderEmployees() {
+            if (!DOMCache.employeesList) return;
+
+            let html = '';
+            const filteredEmployees = AppState.currentFilter === 'all' 
+                ? AppState.employees 
+                : AppState.employees.filter(emp => emp.role === AppState.currentFilter);
+
+            // Filtrar cargos ocultos
+            const hiddenRoles = AppState.hiddenRoles.map(hr => hr.role);
+            const visibleEmployees = filteredEmployees.filter(emp => !hiddenRoles.includes(emp.role));
+
+            visibleEmployees.forEach(employee => {
+                const expertise = employee.expertise || ['Personal Training', 'Nutrição Esportiva'];
+                const rating = employee.rating || 0;
+                const employeeRatings = AppState.ratings.filter(r => r.employeeId === employee.id);
+
+                html += `
+                    <div class="employee-list-item">
+                        <div class="employee-list-header">
+                            <img src="${employee.photo || 'https://i.imgur.com/7R0l7cO.png'}" alt="${employee.name}" class="employee-avatar">
+                            <div class="employee-info-container">
+                                <div class="employee-name-role">
+                                    <h3 class="employee-name">${employee.name || 'Funcionário'}</h3>
+                                    <p class="employee-role">${employee.role || 'Personal Trainer'}</p>
+                                </div>
+                                <div class="employee-rating-badge">
+                                    <i class="fas fa-star"></i>
+                                    ${rating.toFixed(1)}/5.0 (${employeeRatings.length} avaliações)
+                                </div>
+                            </div>
+                        </div>
+                        <div class="employee-list-body">
+                            <p class="employee-description">
+                                ${employee.description || 'Profissional dedicado com anos de experiência em treinamento físico e nutrição esportiva.'}
+                            </p>
+                            <div class="employee-expertise">
+                                ${expertise.map(item => `
+                                    <span class="expertise-tag">${item}</span>
+                                `).join('')}
+                            </div>
+                            <div class="employee-actions">
+                                <button class="btn-view-comments" data-id="${employee.id}">
+                                    <i class="fas fa-comments"></i>
+                                    Ver Comentários (${employeeRatings.length})
+                                </button>
+                                <button class="btn-rate-employee" data-id="${employee.id}">
+                                    <i class="fas fa-star"></i>
+                                    Avaliar Funcionário
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            DOMCache.employeesList.innerHTML = html || '<p class="text-center">Nenhum funcionário encontrado.</p>';
+        }
+
+        function renderRoleFilters() {
+            if (!DOMCache.roleFilterContainer) return;
+
+            // Coletar cargos únicos
+            const roles = ['all'];
+            const hiddenRoles = AppState.hiddenRoles.map(hr => hr.role);
+
+            AppState.employees.forEach(employee => {
+                if (employee.role && !roles.includes(employee.role) && !hiddenRoles.includes(employee.role)) {
+                    roles.push(employee.role);
+                }
+            });
+
+            let html = '';
+            roles.forEach(role => {
+                const label = role === 'all' ? 'Todos' : role;
+                const isActive = role === AppState.currentFilter;
+                html += `
+                    <button class="filter-btn ${isActive ? 'active' : ''}" data-role="${role}">
+                        ${label}
+                    </button>
+                `;
+            });
+
+            DOMCache.roleFilterContainer.innerHTML = html;
+        }
+
+        function renderDashboardPlans() {
+            if (!DOMCache.dashboardPlansList) return;
+
+            let html = '';
+
+            AppState.plans.forEach(plan => {
+                const features = plan.features || [];
+                const isPromotion = plan.promotion || false;
+
+                html += `
+                    <div class="dashboard-plan-item">
+                        <div class="dashboard-plan-header">
+                            <h4 class="dashboard-plan-name">${plan.name || 'Plano'}</h4>
+                            <div class="dashboard-plan-price">R$ ${(plan.price || 0).toFixed(2)}</div>
+                        </div>
+                        <div class="dashboard-plan-details">
+                            <p>${plan.description || 'Plano completo para sua jornada fitness'}</p>
+                            <div class="dashboard-plan-features">
+                                ${features.slice(0, 3).map(feature => `
+                                    <span class="dashboard-plan-feature">${feature}</span>
+                                `).join('')}
+                                ${features.length > 3 ? `<span class="dashboard-plan-feature">+${features.length - 3} mais</span>` : ''}
+                            </div>
+                            <p><strong>Período:</strong> ${plan.period || 'mensal'}</p>
+                            <p><strong>Promoção:</strong> ${isPromotion ? 'Sim' : 'Não'}</p>
+                        </div>
+                        <div class="dashboard-plan-actions">
+                            <button class="btn-action btn-edit" data-action="editPlan" data-id="${plan.id}">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn-action btn-delete" data-action="deletePlan" data-id="${plan.id}">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                            <button class="btn-action btn-promotion" data-action="togglePromotion" data-id="${plan.id}">
+                                <i class="fas ${isPromotion ? 'fa-times' : 'fa-percentage'}"></i> ${isPromotion ? 'Remover Promoção' : 'Marcar como Promoção'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            DOMCache.dashboardPlansList.innerHTML = html || '<p class="text-center">Nenhum plano cadastrado.</p>';
+        }
+
+        function renderDashboardEmployees() {
+            if (!DOMCache.dashboardEmployeesList) return;
+
+            let html = '';
+
+            AppState.employees.forEach(employee => {
+                const rating = employee.rating || 0;
+                const employeeRatings = AppState.ratings.filter(r => r.employeeId === employee.id);
+                const isHidden = AppState.hiddenRoles.some(hr => hr.role === employee.role);
+
+                html += `
+                    <div class="dashboard-plan-item">
+                        <div class="dashboard-plan-header">
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <img src="${employee.photo || 'https://i.imgur.com/7R0l7cO.png'}" alt="${employee.name}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">
+                                <div>
+                                    <h4 class="dashboard-plan-name">${employee.name || 'Funcionário'}</h4>
+                                    <p class="dashboard-plan-price">${employee.role || 'Personal Trainer'}</p>
+                                    <div class="dashboard-plan-features">
+                                        <span class="dashboard-plan-feature">${'★'.repeat(Math.round(rating))}${'☆'.repeat(5-Math.round(rating))} ${rating.toFixed(1)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dashboard-plan-details">
+                            <p>${employee.description || 'Profissional dedicado com anos de experiência.'}</p>
+                            <p><strong>Especialidades:</strong> ${(employee.expertise || []).join(', ')}</p>
+                            <p><strong>Status:</strong> ${isHidden ? '<span style="color: #e74c3c;">Oculto (cargo escondido)</span>' : '<span style="color: #27ae60;">Visível</span>'}</p>
+                        </div>
+                        <div class="dashboard-plan-actions">
+                            <button class="btn-action btn-edit" data-action="editEmployee" data-id="${employee.id}">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn-action btn-delete" data-action="deleteEmployee" data-id="${employee.id}">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                            <button class="btn-action btn-promotion" data-action="toggleVerified" data-id="${employee.id}">
+                                <i class="fas fa-check-circle"></i> ${employee.verified ? 'Remover Verificação' : 'Verificar'}
+                            </button>
+                            ${!isHidden ? `
+                            <button class="btn-action btn-hide" data-action="hideRole" data-role="${employee.role}">
+                                <i class="fas fa-eye-slash"></i> Ocultar Cargo
+                            </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            DOMCache.dashboardEmployeesList.innerHTML = html || '<p class="text-center">Nenhum funcionário cadastrado.</p>';
+        }
+
+        function renderHiddenRoles() {
+            if (!DOMCache.hiddenRolesList) return;
+
+            let html = '';
+
+            if (AppState.hiddenRoles.length > 0) {
+                AppState.hiddenRoles.forEach(hiddenRole => {
+                    html += `
+                        <div class="dashboard-plan-item">
+                            <div class="dashboard-plan-header">
+                                <h4 class="dashboard-plan-name">${hiddenRole.role}</h4>
+                            </div>
+                            <div class="dashboard-plan-details">
+                                <p><strong>Oculto desde:</strong> ${new Date(hiddenRole.createdAt || Date.now()).toLocaleDateString('pt-BR')}</p>
+                                <p><em>Este cargo não aparece na tela dos alunos</em></p>
+                            </div>
+                            <div class="dashboard-plan-actions">
+                                <button class="btn-action btn-hide" data-action="showRole" data-role="${hiddenRole.role}">
+                                    <i class="fas fa-eye"></i> Mostrar Cargo
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html = '<p style="text-align: center; color: #999; font-style: italic;">Nenhum cargo oculto no momento.</p>';
+            }
+
+            DOMCache.hiddenRolesList.innerHTML = html;
+        }
+
+        function renderDashboardCandidates() {
+            if (!DOMCache.candidatesList) return;
+
+            let html = '';
+
+            if (AppState.candidates.length > 0) {
+                AppState.candidates.forEach(candidate => {
+                    html += `
+                        <div class="candidate-item">
+                            <div class="candidate-header">
+                                <div class="candidate-info">
+                                    <h4>${candidate.firstName} ${candidate.lastName}</h4>
+                                    <p class="candidate-role">${candidate.role}</p>
+                                    <p><small>${candidate.email} • ${candidate.phone}</small></p>
+                                </div>
+                                <div class="candidate-actions">
+                                    <button class="btn-whatsapp" data-phone="${candidate.phone}">
+                                        <i class="fab fa-whatsapp"></i> WhatsApp
+                                    </button>
+                                    <button class="btn-action btn-delete" data-action="deleteCandidate" data-id="${candidate.id}">
+                                        <i class="fas fa-trash"></i> Excluir
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="dashboard-plan-details">
+                                <p><strong>Endereço:</strong> ${candidate.address}, ${candidate.addressNumber} ${candidate.complement ? '- ' + candidate.complement : ''}</p>
+                                <p><strong>Sobre:</strong> ${candidate.aboutYou}</p>
+                                <p><strong>Experiência:</strong> ${candidate.experience}</p>
+                                <p><small>Data de candidatura: ${new Date(candidate.createdAt || Date.now()).toLocaleDateString('pt-BR')}</small></p>
+                            </div>
+                        </div>
+                    `;
+                });
+            } else {
+                html = '<p style="text-align: center; color: #999; font-style: italic;">Nenhum candidato encontrado.</p>';
+            }
+
+            DOMCache.candidatesList.innerHTML = html;
+        }
+
+        function renderDashboardUsers() {
+            if (!DOMCache.accessList) return;
+
+            let html = '';
+
+            // Adicionar o acesso principal (adielfhellip@gmail.com)
+            const mainUser = {
+                email: 'adielfhellip@gmail.com',
+                name: 'Administrador Principal',
+                password: '••••••••'
+            };
+
+            html += `
+                <div class="access-item">
+                    <div class="access-info">
+                        <h4>${mainUser.name}</h4>
+                        <p class="access-email">${mainUser.email}</p>
+                        <p class="access-password">${mainUser.password}</p>
+                        <p><small><em>Acesso principal - não visível para outros usuários</em></small></p>
+                    </div>
+                </div>
+            `;
+
+            // Adicionar outros usuários
+            AppState.users.forEach(user => {
+                if (user.email !== 'adielfhellip@gmail.com') {
+                    html += `
+                        <div class="access-item">
+                            <div class="access-info">
+                                <h4>${user.name || 'Usuário'}</h4>
+                                <p class="access-email">${user.email}</p>
+                                <p class="access-password">••••••••</p>
+                                <p><small>Criado em: ${new Date(user.createdAt || Date.now()).toLocaleDateString('pt-BR')}</small></p>
+                            </div>
+                            <div class="dashboard-plan-actions">
+                                <button class="btn-action btn-delete" data-action="deleteAccess" data-id="${user.id}">
+                                    <i class="fas fa-trash"></i> Excluir
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            DOMCache.accessList.innerHTML = html;
+        }
+
+        // ============================
+        // FUNÇÕES DE UI
+        // ============================
+
+        function openSidebar() {
+            DOMCache.sidebar.classList.add('active');
+            DOMCache.overlay.classList.add('active');
+        }
+
+        function closeSidebar() {
+            DOMCache.sidebar.classList.remove('active');
+            DOMCache.overlay.classList.remove('active');
+        }
+
+        function openConfigModal() {
+            DOMCache.configModal.classList.add('active');
+        }
+
+        function closeConfigModal() {
+            DOMCache.configModal.classList.remove('active');
+        }
+
+        function switchConfigTab(tabId) {
+            // Atualizar tabs
+            document.querySelectorAll('.config-tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+
+            // Mostrar conteúdo da tab
+            document.querySelectorAll('.config-tab-content').forEach(content => {
+                content.classList.remove('active');
+                if (content.dataset.tab === tabId) {
+                    content.classList.add('active');
+                }
+            });
+        }
+
+        function openWorkModal() {
+            DOMCache.workModal.classList.add('active');
+        }
+
+        function closeWorkModal() {
+            DOMCache.workModal.classList.remove('active');
+        }
+
+        function openWorkFormModal(role) {
+            DOMCache.selectedRole.value = role;
+            closeWorkModal();
+            DOMCache.workFormModal.classList.add('active');
+        }
+
+        function closeWorkFormModal() {
+            DOMCache.workFormModal.classList.remove('active');
+            DOMCache.workForm.reset();
+        }
+
+        function openCommentsModal(employeeId) {
+            const employee = AppState.employees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            const employeeRatings = AppState.ratings.filter(r => r.employeeId === employeeId);
+
+            // Atualizar informações do funcionário no modal
+            const employeeInfoHtml = `
+                <img src="${employee.photo || 'https://i.imgur.com/7R0l7cO.png'}" alt="${employee.name}" class="rating-modal-employee-avatar">
+                <div class="rating-modal-employee-details">
+                    <h4>${employee.name}</h4>
+                    <p>${employee.role || 'Personal Trainer'}</p>
+                    <p>${employeeRatings.length} avaliações</p>
+                </div>
+            `;
+
+            DOMCache.commentsEmployeeInfo.innerHTML = employeeInfoHtml;
+            DOMCache.commentsModalTitle.textContent = `Comentários - ${employee.name}`;
+            DOMCache.commentsModalSubtitle.textContent = 'Avaliações dos alunos sobre este profissional';
+
+            // Carregar comentários
+            let commentsHtml = '';
+            if (employeeRatings.length > 0) {
+                const sortedRatings = [...employeeRatings].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+                sortedRatings.forEach(rating => {
+                    commentsHtml += `
+                        <div class="comment-item">
+                            <div class="comment-header">
+                                <span class="comment-author">${rating.studentName || 'Anônimo'}</span>
+                                <span class="comment-date">${new Date(rating.createdAt || Date.now()).toLocaleDateString('pt-BR')}</span>
+                            </div>
+                            <div class="comment-rating">
+                                ${'★'.repeat(rating.rating || 0)}${'☆'.repeat(5-(rating.rating || 0))}
+                            </div>
+                            <p class="comment-text">${rating.comment || 'Sem comentário'}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                commentsHtml = '<p style="text-align: center; color: #999; font-style: italic;">Nenhum comentário encontrado para este funcionário.</p>';
+            }
+
+            DOMCache.commentsList.innerHTML = commentsHtml;
+            DOMCache.commentsModal.classList.add('active');
+        }
+
+        function closeCommentsModal() {
+            DOMCache.commentsModal.classList.remove('active');
+        }
+
+        function showMainPage() {
+            DOMCache.loginContainer.style.display = 'none';
+            DOMCache.dashboard.style.display = 'none';
+            document.querySelector('main').style.display = 'block';
+            document.querySelector('footer').style.display = 'block';
+            document.querySelector('header').style.display = 'block';
+            DOMCache.supportBtn.style.display = 'flex';
+        }
+
+        function showDashboard() {
+            if (!AppState.isLoggedIn) {
+                showLogin();
+                return;
+            }
+
+            DOMCache.loginContainer.style.display = 'none';
+            DOMCache.dashboard.style.display = 'block';
+            document.querySelector('main').style.display = 'none';
+            document.querySelector('footer').style.display = 'none';
+            document.querySelector('header').style.display = 'none';
+            DOMCache.supportBtn.style.display = 'none';
+
+            switchTab('plans');
+        }
+
+        function showLogin() {
+            DOMCache.loginContainer.style.display = 'flex';
+            DOMCache.dashboard.style.display = 'none';
+            document.querySelector('main').style.display = 'none';
+            document.querySelector('footer').style.display = 'none';
+            document.querySelector('header').style.display = 'none';
+            DOMCache.supportBtn.style.display = 'none';
+
+            DOMCache.loginForm.reset();
+            DOMCache.loginError.style.display = 'none';
+        }
+
+        function switchTab(tabId) {
+            // Remover classe active de todas as abas
+            document.querySelectorAll('.dashboard-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remover classe active de todos os conteúdos
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Adicionar classe active à aba selecionada
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+
+            // Mostrar conteúdo da aba selecionada
+            document.getElementById(`${tabId}Tab`).classList.add('active');
+        }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function toggleCompanyProfile() {
+            // Esta função agora apenas mostra/oculta no dashboard
+            // O perfil da empresa foi removido da tela do aluno
+            showSuccess('A função "Mostrar/Ocultar Perfil" agora controla apenas a exibição no Dashboard');
+        }
+
+        // ============================
+        // AVALIAÇÕES
+        // ============================
+
+        function openRatingModal(employeeId) {
+            const employee = AppState.employees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            AppState.currentEmployeeId = employeeId;
+
+            // Atualizar informações do funcionário no modal
+            const employeeInfoHtml = `
+                <img src="${employee.photo || 'https://i.imgur.com/7R0l7cO.png'}" alt="${employee.name}" class="rating-modal-employee-avatar">
+                <div class="rating-modal-employee-details">
+                    <h4>${employee.name}</h4>
+                    <p>${employee.role || 'Personal Trainer'}</p>
+                </div>
+            `;
+
+            DOMCache.ratingEmployeeInfo.innerHTML = employeeInfoHtml;
+
+            // Limpar formulário
+            document.getElementById('studentName').value = '';
+            document.getElementById('comment').value = '';
+            setRating(0);
+
+            // Definir o ID do funcionário no campo hidden
+            document.getElementById('employeeId').value = employeeId;
+
+            // Abrir modal
+            DOMCache.ratingModal.classList.add('active');
+        }
+
+        function closeRatingModal() {
+            DOMCache.ratingModal.classList.remove('active');
+            AppState.currentEmployeeId = null;
+        }
+
+        function setRating(value) {
+            document.querySelectorAll('.rating-star-large').forEach(star => {
+                const starValue = parseInt(star.getAttribute('data-value'));
+                star.classList.toggle('active', starValue <= value);
+            });
+        }
+
+        async function handleRatingSubmit(e) {
+            e.preventDefault();
+
+            const studentName = document.getElementById('studentName').value.trim();
+            const comment = document.getElementById('comment').value.trim();
+            const ratingStars = document.querySelectorAll('.rating-star-large.active').length;
+            const employeeId = document.getElementById('employeeId').value;
+
+            // Validação
+            if (!studentName || !comment || ratingStars === 0 || !employeeId) {
+                showError('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            try {
+                toggleLoading(DOMCache.submitRatingBtn, DOMCache.submitRatingText, DOMCache.submitRatingLoading, true);
+
+                const ratingData = {
+                    employeeId: employeeId,
+                    studentName: studentName,
+                    rating: ratingStars,
+                    comment: comment,
+                    createdAt: Date.now()
+                };
+
+                // Salvar no Firebase
+                const newRatingRef = ratingsRef.push();
+                await newRatingRef.set(ratingData);
+
+                // Atualizar avaliação do funcionário
+                await updateEmployeeRating(employeeId);
+
+                closeRatingModal();
+                showSuccess('Avaliação enviada com sucesso! Obrigado pelo feedback.');
+
+            } catch (error) {
+                console.error('❌ Erro ao enviar avaliação:', error);
+                showError('Erro ao enviar avaliação. Tente novamente.');
+            } finally {
+                toggleLoading(DOMCache.submitRatingBtn, DOMCache.submitRatingText, DOMCache.submitRatingLoading, false);
+            }
+        }
+
+        async function handleWorkFormSubmit(e) {
+            e.preventDefault();
+
+            const role = DOMCache.selectedRole.value;
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const birthDate = document.getElementById('birthDate').value;
+            const email = document.getElementById('candidateEmail').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const addressNumber = document.getElementById('addressNumber').value.trim();
+            const complement = document.getElementById('complement').value.trim();
+            const aboutYou = document.getElementById('aboutYou').value.trim();
+            const experience = document.getElementById('experience').value.trim();
+
+            // Validação
+            if (!firstName || !lastName || !birthDate || !email || !phone || !address || !addressNumber || !aboutYou || !experience) {
+                showError('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+
+            // Validar idade (18+)
+            const birth = new Date(birthDate);
+            const today = new Date();
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+
+            if (age < 18) {
+                showError('Você deve ter 18 anos ou mais para se candidatar.');
+                return;
+            }
+
+            try {
+                toggleLoading(DOMCache.submitWorkFormBtn, DOMCache.submitWorkFormText, DOMCache.submitWorkFormLoading, true);
+
+                const candidateData = {
+                    role: role,
+                    firstName: firstName,
+                    lastName: lastName,
+                    birthDate: birthDate,
+                    email: email,
+                    phone: phone,
+                    address: address,
+                    addressNumber: addressNumber,
+                    complement: complement,
+                    aboutYou: aboutYou,
+                    experience: experience,
+                    createdAt: Date.now()
+                };
+
+                // Salvar no Firebase
+                const newCandidateRef = candidatesRef.push();
+                await newCandidateRef.set(candidateData);
+
+                closeWorkFormModal();
+                showSuccess('Candidatura enviada com sucesso! Entraremos em contato em breve.');
+
+            } catch (error) {
+                console.error('❌ Erro ao enviar candidatura:', error);
+                showError('Erro ao enviar candidatura. Tente novamente.');
+            } finally {
+                toggleLoading(DOMCache.submitWorkFormBtn, DOMCache.submitWorkFormText, DOMCache.submitWorkFormLoading, false);
+            }
+        }
+
+        async function handleConfigSubmit(e) {
+            e.preventDefault();
+
+            try {
+                toggleLoading(DOMCache.saveConfigBtn, DOMCache.saveConfigText, DOMCache.saveConfigLoading, true);
+                await saveConfig();
+            } catch (error) {
+                console.error('❌ Erro ao salvar configurações:', error);
+                showError('Erro ao salvar configurações.');
+            } finally {
+                toggleLoading(DOMCache.saveConfigBtn, DOMCache.saveConfigText, DOMCache.saveConfigLoading, false);
+            }
+        }
+
+        // ============================
+        // FUNÇÕES DO DASHBOARD
+        // ============================
+
+        async function addPlan() {
+            const name = prompt("Nome do plano:");
+            if (!name) return;
+
+            const price = parseFloat(prompt("Preço (ex: 89.90):"));
+            if (isNaN(price)) return;
+
+            const period = prompt("Período (mensal/anual):", "mensal");
+            const description = prompt("Descrição do plano:", "Plano completo para sua jornada fitness");
+            const featuresInput = prompt("Benefícios (separados por vírgula):", "Acesso à academia, Aulas de musculação, Avaliação física");
+            const promotion = confirm("Este plano é uma promoção?");
+            const featured = confirm("Destacar este plano?");
+
+            try {
+                const newPlan = {
+                    name: name.trim(),
+                    price,
+                    period: period.trim().toLowerCase(),
+                    description: description.trim(),
+                    features: featuresInput ? featuresInput.split(',').map(f => f.trim()) : [],
+                    promotion,
+                    featured,
+                    createdAt: Date.now()
+                };
+
+                const newPlanRef = plansRef.push();
+                await newPlanRef.set(newPlan);
+                showSuccess('Plano criado com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao criar plano:', error);
+                showError('Erro ao criar plano');
+            }
+        }
+
+        async function editPlan(planId) {
+            const plan = AppState.plans.find(p => p.id === planId);
+            if (!plan) return;
+
+            const name = prompt("Nome do plano:", plan.name);
+            if (!name) return;
+
+            const price = parseFloat(prompt("Preço:", plan.price));
+            if (isNaN(price)) return;
+
+            const period = prompt("Período (mensal/anual):", plan.period);
+            const description = prompt("Descrição:", plan.description);
+            const features = prompt("Benefícios (separados por vírgula):", (plan.features || []).join(', '));
+
+            try {
+                const updates = {
+                    name,
+                    price,
+                    period,
+                    description,
+                    features: features ? features.split(',').map(f => f.trim()) : plan.features
+                };
+
+                await plansRef.child(planId).update(updates);
+                showSuccess('Plano atualizado com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao atualizar plano:', error);
+                showError('Erro ao atualizar plano');
+            }
+        }
+
+        async function deletePlan(planId) {
+            if (!confirm("Tem certeza que deseja excluir este plano?")) return;
+
+            try {
+                await plansRef.child(planId).remove();
+                showSuccess('Plano excluído com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao excluir plano:', error);
+                showError('Erro ao excluir plano');
+            }
+        }
+
+        async function togglePlanPromotion(planId) {
+            const plan = AppState.plans.find(p => p.id === planId);
+            if (!plan) return;
+
+            try {
+                await plansRef.child(planId).update({ promotion: !plan.promotion });
+                showSuccess(`Plano ${!plan.promotion ? 'marcado como promoção' : 'removido das promoções'}!`);
+            } catch (error) {
+                console.error('❌ Erro ao atualizar promoção:', error);
+                showError('Erro ao atualizar promoção');
+            }
+        }
+
+        async function addEmployee() {
+            const name = prompt("Nome do funcionário:");
+            if (!name) return;
+
+            const role = prompt("Cargo:", "Personal Trainer");
+            const description = prompt("Descrição:", "Profissional dedicado com anos de experiência em treinamento físico e nutrição esportiva.");
+            const expertiseInput = prompt("Especialidades (separadas por vírgula):", "Personal Training, Nutrição Esportiva");
+            const photo = prompt("URL da foto (Imgur) - deixe em branco para padrão:", "");
+            const verified = confirm("Este funcionário é verificado?");
+
+            try {
+                const newEmployee = {
+                    name: name.trim(),
+                    role: role.trim(),
+                    description: description.trim(),
+                    expertise: expertiseInput ? expertiseInput.split(',').map(e => e.trim()) : [],
+                    photo: photo.trim() || "",
+                    verified,
+                    rating: 0,
+                    createdAt: Date.now()
+                };
+
+                const newEmployeeRef = employeesRef.push();
+                await newEmployeeRef.set(newEmployee);
+                showSuccess('Funcionário criado com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao criar funcionário:', error);
+                showError('Erro ao criar funcionário');
+            }
+        }
+
+        async function editEmployee(employeeId) {
+            const employee = AppState.employees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            const name = prompt("Nome do funcionário:", employee.name);
+            if (!name) return;
+
+            const role = prompt("Cargo:", employee.role);
+            const description = prompt("Descrição:", employee.description);
+            const expertise = prompt("Especialidades (separadas por vírgula):", (employee.expertise || []).join(', '));
+            const photo = prompt("URL da foto (Imgur):", employee.photo || '');
+
+            try {
+                const updates = {
+                    name,
+                    role,
+                    description,
+                    expertise: expertise ? expertise.split(',').map(e => e.trim()) : employee.expertise,
+                    photo: photo || ''
+                };
+
+                await employeesRef.child(employeeId).update(updates);
+                showSuccess('Funcionário atualizado com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao atualizar funcionário:', error);
+                showError('Erro ao atualizar funcionário');
+            }
+        }
+
+        async function deleteEmployee(employeeId) {
+            if (!confirm("Tem certeza que deseja excluir este funcionário?")) return;
+
+            try {
+                await employeesRef.child(employeeId).remove();
+                showSuccess('Funcionário excluído com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao excluir funcionário:', error);
+                showError('Erro ao excluir funcionário');
+            }
+        }
+
+        async function toggleEmployeeVerified(employeeId) {
+            const employee = AppState.employees.find(e => e.id === employeeId);
+            if (!employee) return;
+
+            try {
+                await employeesRef.child(employeeId).update({ verified: !employee.verified });
+                showSuccess(`Funcionário ${!employee.verified ? 'verificado' : 'removido da verificação'}!`);
+            } catch (error) {
+                console.error('❌ Erro ao atualizar verificação:', error);
+                showError('Erro ao atualizar verificação');
+            }
+        }
+
+        async function hideRole(role) {
+            if (!confirm(`Tem certeza que deseja ocultar o cargo "${role}" na tela dos alunos?`)) return;
+
+            try {
+                const hiddenRoleRef = hiddenRolesRef.push();
+                await hiddenRoleRef.set({
+                    role: role,
+                    createdAt: Date.now()
+                });
+                showSuccess(`Cargo "${role}" ocultado com sucesso!`);
+            } catch (error) {
+                console.error('❌ Erro ao ocultar cargo:', error);
+                showError('Erro ao ocultar cargo');
+            }
+        }
+
+        async function showRole(role) {
+            try {
+                // Encontrar e remover o cargo oculto
+                const hiddenRole = AppState.hiddenRoles.find(hr => hr.role === role);
+                if (hiddenRole) {
+                    await hiddenRolesRef.child(hiddenRole.id).remove();
+                    showSuccess(`Cargo "${role}" mostrado com sucesso!`);
+                }
+            } catch (error) {
+                console.error('❌ Erro ao mostrar cargo:', error);
+                showError('Erro ao mostrar cargo');
+            }
+        }
+
+        async function deleteComment(commentId) {
+            if (!confirm("Tem certeza que deseja excluir esta avaliação?")) return;
+
+            try {
+                await ratingsRef.child(commentId).remove();
+                await loadDashboardComments();
+                showSuccess('Avaliação excluída com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao excluir avaliação:', error);
+                showError('Erro ao excluir avaliação');
+            }
+        }
+
+        async function deleteCandidate(candidateId) {
+            if (!confirm("Tem certeza que deseja excluir este candidato?")) return;
+
+            try {
+                await candidatesRef.child(candidateId).remove();
+                showSuccess('Candidato excluído com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao excluir candidato:', error);
+                showError('Erro ao excluir candidato');
+            }
+        }
+
+        async function contactCandidate(candidateId) {
+            const candidate = AppState.candidates.find(c => c.id === candidateId);
+            if (!candidate) return;
+
+            const phone = candidate.phone.replace(/\D/g, '');
+            const message = encodeURIComponent(`Olá ${candidate.firstName}, vimos sua candidatura para a vaga de ${candidate.role} na Target Fit e gostaríamos de conversar com você!`);
+            const url = `https://wa.me/55${phone}?text=${message}`;
+            window.open(url, '_blank');
+        }
+
+        async function addAccess() {
+            const email = prompt("E-mail do novo usuário:");
+            if (!email) return;
+
+            const name = prompt("Nome do usuário:");
+            if (!name) return;
+
+            const password = prompt("Senha (mínimo 6 caracteres):");
+            if (!password || password.length < 6) {
+                showError('A senha deve ter pelo menos 6 caracteres.');
+                return;
+            }
+
+            try {
+                // Criar usuário no Firebase Auth
+                const userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+
+                // Salvar informações no Realtime Database
+                const userData = {
+                    email: email,
+                    name: name,
+                    createdAt: Date.now()
+                };
+
+                const newUserRef = usersRef.push();
+                await newUserRef.set(userData);
+
+                showSuccess('Acesso criado com sucesso!');
+                console.log('Usuário criado:', userCredential.user.email);
+
+                // Fazer logout do novo usuário (mantém o admin logado)
+                await firebaseAuth.signOut();
+                await firebaseAuth.signInWithEmailAndPassword('adielfhellip@gmail.com', '717928');
+
+            } catch (error) {
+                console.error('❌ Erro ao criar acesso:', error);
+                showError('Erro ao criar acesso: ' + error.message);
+            }
+        }
+
+        async function deleteAccess(userId) {
+            if (!confirm("Tem certeza que deseja excluir este acesso?")) return;
+
+            try {
+                await usersRef.child(userId).remove();
+                showSuccess('Acesso excluído com sucesso!');
+            } catch (error) {
+                console.error('❌ Erro ao excluir acesso:', error);
+                showError('Erro ao excluir acesso');
+            }
+        }
+
+        async function updateEmployeeRating(employeeId) {
+            try {
+                const snapshot = await ratingsRef.orderByChild('employeeId').equalTo(employeeId).once('value');
+                let totalRating = 0;
+                let count = 0;
+
+                snapshot.forEach(childSnapshot => {
+                    const data = childSnapshot.val();
+                    totalRating += data.rating || 0;
+                    count++;
+                });
+
+                const newRating = count > 0 ? (totalRating / count).toFixed(1) : 0;
+                await employeesRef.child(employeeId).update({ rating: parseFloat(newRating) });
+
+                // Atualizar UI local
+                const employeeIndex = AppState.employees.findIndex(e => e.id === employeeId);
+                if (employeeIndex !== -1) {
+                    AppState.employees[employeeIndex].rating = parseFloat(newRating);
+                    renderEmployees();
+                    renderDashboardEmployees();
+                }
+
+            } catch (error) {
+                console.error('❌ Erro ao atualizar avaliação do funcionário:', error);
+            }
+        }
+
+        function updateEmployeesWithRatings() {
+            AppState.employees.forEach(employee => {
+                const employeeRatings = AppState.ratings.filter(r => r.employeeId === employee.id);
+
+                if (employeeRatings.length > 0) {
+                    const totalRating = employeeRatings.reduce((sum, r) => sum + (r.rating || 0), 0);
+                    employee.rating = (totalRating / employeeRatings.length).toFixed(1);
+                } else {
+                    employee.rating = 0;
+                }
+            });
+
+            if (DOMCache.employeesList.innerHTML) {
+                renderEmployees();
+            }
+        }
+
+        // ============================
+        // FUNÇÕES ÚTEIS
+        // ============================
+
+        function toggleLoading(button, textElement, loadingElement, isLoading) {
+            AppState.isLoading = isLoading;
+
+            if (isLoading) {
+                textElement.classList.add('hidden');
+                loadingElement.classList.remove('hidden');
+                button.disabled = true;
+            } else {
+                textElement.classList.remove('hidden');
+                loadingElement.classList.add('hidden');
+                button.disabled = false;
+            }
+        }
+
+        function showError(message) {
+            alert(`❌ Erro: ${message}`);
+        }
+
+        function showSuccess(message) {
+            alert(`✅ Sucesso: ${message}`);
+        }
+
+        function showLoginError(message) {
+            DOMCache.loginError.textContent = message;
+            DOMCache.loginError.style.display = 'block';
+        }
+
+        // ============================
+        // FUNÇÕES AUXILIARES
+        // ============================
+
+        function loadFallbackData() {
+            console.log('📱 Carregando dados de exemplo...');
+
+            if (AppState.plans.length === 0) {
+                AppState.plans = [{
+                    id: 'demo1',
+                    name: 'PLANO BLACK',
+                    price: 89.90,
+                    period: 'mensal',
+                    description: 'Plano completo com acesso a todas as áreas da academia',
+                    features: ['Acesso ilimitado à academia', 'Aulas de musculação', 'Aulas de aeróbico', 'Avaliação física mensal'],
+                    promotion: true,
+                    featured: true,
+                    clicks: 0
+                }, {
+                    id: 'demo2',
+                    name: 'PLANO PREMIUM',
+                    price: 129.90,
+                    period: 'mensal',
+                    description: 'Plano premium com acompanhamento personalizado',
+                    features: ['Acesso ilimitado', 'Personal trainer 2x por semana', 'Avaliação nutricional', 'Acesso a todas as aulas'],
+                    promotion: false,
+                    featured: false,
+                    clicks: 0
+                }];
+                renderPlans();
+            }
+
+            if (AppState.employees.length === 0) {
+                AppState.employees = [{
+                    id: 'demo1',
+                    name: 'Carlos Silva',
+                    role: 'Personal Trainer',
+                    description: 'Profissional com 10 anos de experiência em treinamento físico, especializado em emagrecimento e hipertrofia.',
+                    expertise: ['Emagrecimento', 'Hipertrofia', 'Nutrição Esportiva'],
+                    photo: 'https://i.imgur.com/7R0l7cO.png',
+                    verified: true,
+                    rating: 4.5
+                }, {
+                    id: 'demo2',
+                    name: 'Ana Paula Costa',
+                    role: 'Nutricionista Esportiva',
+                    description: 'Nutricionista especializada em dietas para atletas e praticantes de atividade física.',
+                    expertise: ['Nutrição Esportiva', 'Dietas Personalizadas', 'Suplementação'],
+                    photo: 'https://i.imgur.com/7R0l7cO.png',
+                    verified: true,
+                    rating: 4.8
+                }];
+                renderEmployees();
+                renderRoleFilters();
+            }
+        }
+
+        // ============================
+        // INICIALIZAR APLICAÇÃO
+        // ============================
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
