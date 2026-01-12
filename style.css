@@ -2989,14 +2989,18 @@ footer {
     font-size: 0.9rem;
 }
 
+/* CORREÇÃO: NÚMERO DE TELEFONE BRANCO */
 .footer-contact p span {
-    color: var(--white) !important; /* Garante que o texto seja branco */
+    color: var(--white) !important;
 }
 
-/* Ajuste específico para o número de telefone */
-#footerPhone, #footerPhone span, 
-.footer-contact p span, 
-.footer-contact p .phone-number,
+/* Remover estilo de link azul para números de telefone */
+.footer-contact a[href^="tel:"] {
+    color: var(--white) !important;
+    text-decoration: none;
+}
+
+/* Estilo específico para o número 11959749844 */
 .footer-contact p:contains("11959749844") {
     color: var(--white) !important;
 }
@@ -3009,12 +3013,32 @@ footer {
     color: var(--white) !important;
 }
 
+/* CORREÇÃO: GRADIENTE VERMELHO PARA "TARGET" NO COPYRIGHT */
 .copyright {
     text-align: center;
     padding-top: 25px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     font-size: 0.9rem;
     opacity: 0.7;
+}
+
+/* Estilo para a palavra "Target" com gradiente vermelho */
+.copyright #targetLink {
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    padding: 2px 4px;
+}
+
+.copyright #targetLink:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 10px rgba(139, 0, 0, 0.7);
 }
 
 /* ============================
