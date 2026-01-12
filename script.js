@@ -2089,6 +2089,7 @@ async function loadRatings() {
                 });
 
                 updateEmployeesWithRatings();
+                // CORREÇÃO: Chamar renderCommentsSection para exibir avaliações desde o início
                 renderCommentsSection();
             }
 
@@ -2359,7 +2360,9 @@ function renderCommentsSection() {
         .slice(0, 6);
 
     if (recentRatings.length === 0) {
-        html = '<p class="text-center">Nenhuma avaliação disponível no momento.</p>';
+        // CORREÇÃO: Remover mensagem que só aparecia depois de adicionar funcionário
+        // e mostrar mensagem mais clara
+        html = '<p class="text-center">Seja o primeiro a avaliar nossos profissionais!</p>';
     } else {
         recentRatings.forEach(rating => {
             const employee = AppState.employees.find(e => e.id === rating.employeeId);
