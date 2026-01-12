@@ -303,7 +303,7 @@ header {
     right: 25px;
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -320,8 +320,9 @@ header {
 
 .support-btn:hover {
     transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 10px 30px rgba(196, 30, 58, 0.4);
+    box-shadow: 0 10px 30px rgba(139, 0, 0, 0.4); /* Cor do shadow atualizada */
     animation: pulse 2s infinite;
+    background: linear-gradient(135deg, #5A0000 0%, #8B0000 100%); /* Gradiente invertido no hover */
 }
 
 .support-btn:active {
@@ -388,7 +389,7 @@ header {
     z-index: 999;
     text-align: center;
     padding: 15px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: white;
     animation: slideIn 0.5s ease-out;
 }
@@ -816,11 +817,11 @@ main {
 }
 
 .filter-btn.active {
-    background-color: var(--primary-red);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: var(--white);
-    border-color: var(--primary-red);
+    border-color: transparent;
     transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(196, 30, 58, 0.3);
+    box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
 }
 
 .filter-btn.active::before {
@@ -879,7 +880,7 @@ main {
     position: absolute;
     top: 15px;
     right: -30px;
-    background-color: var(--primary-red);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: var(--white);
     padding: 8px 35px;
     transform: rotate(45deg);
@@ -887,14 +888,14 @@ main {
     font-weight: 700;
     letter-spacing: 1px;
     z-index: 2;
-    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
 }
 
 .plan-featured-badge {
     position: absolute;
     top: 20px;
     right: 20px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: var(--white);
     padding: 8px 20px;
     border-radius: 50px;
@@ -903,7 +904,7 @@ main {
     letter-spacing: 1px;
     text-transform: uppercase;
     z-index: 2;
-    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
 }
 
 .plan-header {
@@ -1016,7 +1017,7 @@ main {
     display: block;
     width: 100%;
     padding: 15px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: var(--white);
     text-align: center;
     text-decoration: none;
@@ -1026,7 +1027,7 @@ main {
     font-size: 1rem;
     cursor: pointer;
     transition: var(--transition);
-    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
     letter-spacing: 0.5px;
     position: relative;
     overflow: hidden;
@@ -1034,8 +1035,9 @@ main {
 
 .btn-plan:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(196, 30, 58, 0.4);
+    box-shadow: 0 8px 25px rgba(139, 0, 0, 0.4);
     letter-spacing: 1px;
+    background: linear-gradient(135deg, #5A0000 0%, #8B0000 100%); /* Gradiente invertido no hover */
 }
 
 .btn-plan:active {
@@ -1174,7 +1176,7 @@ main {
 .partner-link {
     display: inline-block;
     padding: 10px 20px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: var(--white);
     text-decoration: none;
     border-radius: 50px;
@@ -1185,7 +1187,8 @@ main {
 
 .partner-link:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(196, 30, 58, 0.3);
+    box-shadow: 0 5px 15px rgba(139, 0, 0, 0.3);
+    background: linear-gradient(135deg, #5A0000 0%, #8B0000 100%); /* Gradiente invertido no hover */
 }
 
 /* ============================
@@ -1389,7 +1392,7 @@ main {
 
 .btn-rate-employee {
     padding: 14px 35px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: var(--white);
     border: none;
     border-radius: 50px;
@@ -1399,14 +1402,15 @@ main {
     display: flex;
     align-items: center;
     gap: 10px;
-    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.2);
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
     position: relative;
     overflow: hidden;
 }
 
 .btn-rate-employee:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px rgba(196, 30, 58, 0.4);
+    box-shadow: 0 8px 20px rgba(139, 0, 0, 0.4);
+    background: linear-gradient(135deg, #5A0000 0%, #8B0000 100%); /* Gradiente invertido no hover */
 }
 
 .btn-rate-employee:active {
@@ -1664,7 +1668,7 @@ textarea.form-control {
 .btn-submit-rating {
     flex: 1;
     padding: 16px;
-    background: linear-gradient(135deg, var(--primary-red) 0%, var(--dark-red) 100%);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: var(--white);
     border: none;
     border-radius: 8px;
@@ -1678,7 +1682,8 @@ textarea.form-control {
 
 .btn-submit-rating:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(196, 30, 58, 0.3);
+    box-shadow: 0 6px 16px rgba(139, 0, 0, 0.3);
+    background: linear-gradient(135deg, #5A0000 0%, #8B0000 100%); /* Gradiente invertido no hover */
 }
 
 .btn-submit-rating.loading {
@@ -1980,7 +1985,7 @@ textarea.form-control {
 }
 
 .config-tab.active {
-    background-color: var(--primary-red);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     color: var(--white);
     transform: translateY(-2px);
 }
@@ -2297,9 +2302,9 @@ textarea.form-control {
 }
 
 .logout-btn:hover {
-    background-color: var(--primary-red);
+    background: linear-gradient(135deg, #8B0000 0%, #5A0000 100%); /* Gradiente vermelho escuro */
     transform: translateX(3px);
-    box-shadow: 0 4px 12px rgba(196, 30, 58, 0.3);
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
 }
 
 .dashboard-content {
@@ -2985,6 +2990,22 @@ footer {
 }
 
 .footer-contact p span {
+    color: var(--white) !important; /* Garante que o texto seja branco */
+}
+
+/* Ajuste específico para o número de telefone */
+#footerPhone, #footerPhone span, 
+.footer-contact p span, 
+.footer-contact p .phone-number,
+.footer-contact p:contains("11959749844") {
+    color: var(--white) !important;
+}
+
+/* Garantir que todos os textos na seção de contato sejam brancos */
+.footer-contact p,
+.footer-contact p span,
+.footer-contact p i + span,
+.footer-contact p .contact-text {
     color: var(--white) !important;
 }
 
@@ -3362,4 +3383,20 @@ button:disabled, .btn-plan:disabled {
     cursor: not-allowed;
     transform: none !important;
     animation: none !important;
+}
+
+/* Estilos específicos para o botão Target no footer */
+#targetLink {
+    color: #FFD700 !important; /* Dourado para destacar */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: var(--transition);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#targetLink:hover {
+    color: var(--light-red) !important;
+    transform: scale(1.1);
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.7);
 }
